@@ -42,13 +42,13 @@ HistSettingsWindow::HistSettingsWindow(HistWindow* hw, QWidget* parent)
 	// Configure output events
 	if (!hw)
 	{
-		DCS::Utils::Logger::Critical("Failed to establish link from [Graph Settings] to [Graph] windows.");
-		DCS::Utils::Logger::Critical("Settings window will not function properly!!!");
+		LOG_CRITICAL("Failed to establish link from [Graph Settings] to [Graph] windows.");
+		LOG_CRITICAL("Settings window will not function properly!!!");
 	}
 	else
 	{
 		(void)connect(this, &HistSettingsWindow::settingsChangedSig, hw, &HistWindow::updateAllSettings);
-		DCS::Utils::Logger::Debug("[Graph Settings] -> [Graph] link successful!");
+		LOG_DEBUG("[Graph Settings] -> [Graph] link successful!");
 	}
 
 	// 'Axis' Tab settings
@@ -122,7 +122,7 @@ void HistSettingsWindow::hideEvent(QHideEvent* event)
 
 void HistSettingsWindow::updateAllSettingsValue()
 {
-	DCS::Utils::Logger::Debug("Save new graph settings.");
+	LOG_DEBUG("Save new graph settings.");
 	settings.maximum_bins = widgets.max_bin_spinBox->value();
 	settings.bins_color = widgets.bin_color_comboBox->currentData().value<QColor>();
 	settings.bins_color_idx = widgets.bin_color_comboBox->currentIndex();
@@ -132,7 +132,7 @@ void HistSettingsWindow::updateAllSettingsValue()
 
 void HistSettingsWindow::resetAllSettingsValue()
 {
-	DCS::Utils::Logger::Debug("Reset all graph settings.");
+	LOG_DEBUG("Reset all graph settings.");
 	widgets.max_bin_spinBox->setValue(settings.maximum_bins);
 	widgets.bin_color_comboBox->setCurrentIndex(settings.bins_color_idx);
 }

@@ -101,7 +101,7 @@ void HistWindow::mouseReleaseEvent(QMouseEvent* event)
 			zoom_region = zoom_region.translated(0.0, getChartCoordFromSeriesCoord(QPointF(0.0, 0.0), bar_series).y() - zoom_region.bottomLeft().y());
 		}
 
-		DCS::Utils::Logger::Debug("Zooming Chart -- RECT[%lf, %lf]", zoom_region.topLeft().x(), zoom_region.topLeft().y());
+		LOG_DEBUG("Zooming Chart -- RECT[%lf, %lf]", zoom_region.topLeft().x(), zoom_region.topLeft().y());
 		chart->zoomIn(zoom_region);
 
 		//axis_x->setRange(min_x, max_x);
@@ -109,7 +109,7 @@ void HistWindow::mouseReleaseEvent(QMouseEvent* event)
 	}
 	else if (event->button() == Qt::MouseButton::RightButton)
 	{
-		DCS::Utils::Logger::Debug("Reset chart zoom");
+		LOG_DEBUG("Reset chart zoom");
 		resetZoom();
 	}
 
@@ -172,7 +172,7 @@ void HistWindow::updateBin(int idx)
 
 	if (idx >= s->count())
 	{
-		DCS::Utils::Logger::Error("Trying to update QBarSeries with invalid index. Ignoring...");
+		LOG_ERROR("Trying to update QBarSeries with invalid index. Ignoring...");
 	}
 	else
 	{
@@ -245,11 +245,11 @@ void HistWindow::setAxisBinRange(int nbins)
 		bar_series->attachAxis(axis_x);
 		bar_series->attachAxis(axis_y);
 
-		DCS::Utils::Logger::Debug("Bar set reset successful.");
+		LOG_DEBUG("Bar set reset successful.");
 	}
 	else
 	{
-		DCS::Utils::Logger::Error("Failed to remove bar set from graph on reset.");
+		LOG_ERROR("Failed to remove bar set from graph on reset.");
 	}
 
 	resetZoom();

@@ -8,11 +8,11 @@
 #include <QFile>
 
 using namespace DCS::Utils;
+using namespace DCS::Network;
 
 int main(int argc, char *argv[])
 {
 	Logger::Init(Logger::Verbosity::DEBUG);
-
 
     QApplication a(argc, argv);
 
@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 
     MainWindow w;
 
-	QFile f("../../styles/default.css");
+	QFile f("../../../client/styles/default.css"); // TODO : In a proper env this needs to be replaced for a app recognized path
 	if (!f.open(QFile::ReadOnly | QFile::Text))
 	{
-		Logger::Error("Failed to load stylesheet. Maybe location is wrong?");
+		LOG_ERROR("Failed to load stylesheet. Maybe location is wrong?");
 	}
 	else
 	{
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
 		if (f.size() > 0)
 		{
-			Logger::Message("Loaded custom stylesheet.");
+			LOG_MESSAGE("Loaded custom stylesheet.");
 		}
 
 		QString s = in.readAll();

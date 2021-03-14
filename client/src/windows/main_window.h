@@ -8,6 +8,7 @@
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
+#include <DCS_Network/include/DCS_ModuleNetwork.h>
 
 class MainWindow : public QMainWindow
 {
