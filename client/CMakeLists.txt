@@ -15,7 +15,7 @@ set(CMAKE_PREFIX_PATH "H:/Qt/5.15.1/msvc2019_64")
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Charts REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Charts REQUIRED)
 
-add_executable(DCScan-Client WIN32 # Disable console
+add_executable(DCScan-Client #WIN32 # Disable console
 	src/main.cpp
 	src/windows/main_window.cpp
 	src/windows/main_window.h

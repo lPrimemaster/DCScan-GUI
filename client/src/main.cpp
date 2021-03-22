@@ -14,6 +14,36 @@ int main(int argc, char *argv[])
 {
 	Logger::Init(Logger::Verbosity::DEBUG);
 
+	Init();
+
+	Socket c = Client::Connect("127.0.0.1", 15777);
+
+	Client::StartThread(c);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+	unsigned char buffer[1024];
+	auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+		SV_CALL_DCS_Threading_GetMaxHardwareConcurrency
+	);
+
+	auto max_threads_srv_b = Message::SendSync(Message::Operation::REQUEST, buffer, size_written);
+	auto max_threads_srv = *(DCS::u16*)max_threads_srv_b.ptr;
+
+	LOG_DEBUG("Got server max thread concurrency: %d", max_threads_srv);
+
+	size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_OnTestFibSeq, [] (DCS::u8* data) {
+		LOG_DEBUG("FibEvent returned: %llu", *(DCS::u64*)data);
+	});
+
+	Message::SendAsync(Message::Operation::EVT_SUB, buffer, size_written);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(30000));
+
+	Client::StopThread(c);
+
+	Destroy();
+
     QApplication a(argc, argv);
 
 	// Register custom signal data
