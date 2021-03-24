@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	// Initialize control services
 	DCS::Control::StartServices();
 
-	std::thread t([] { 
+	/*std::thread t([] { 
 			std::this_thread::sleep_for(std::chrono::milliseconds(5000)); 
 
 			while (true) 
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 				DCS::Network::Message::FibSeqEvt(); 
 				std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
 			} 
-	});
+	});*/
 
 	auto listen = DCS::Network::Server::Create(15777);
 
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
 	DCS::Utils::Logger::Destroy();
 
-	t.join();
+	//t.join();
 
 	return 0;
 }
