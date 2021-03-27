@@ -14,7 +14,7 @@
 using namespace DCS::Utils;
 using namespace DCS::Network;
 
-static std::vector<std::vector<float>> RunToWaitPoll(int rep, float acc_min = 1.0f, float acc_max = 200.0f)
+static void RunToWaitPoll(int rep, float acc_min = 1.0f, float acc_max = 200.0f)
 {
 	LOG_DEBUG("Starting RotDev test battery...");
 
@@ -82,7 +82,12 @@ static std::vector<std::vector<float>> RunToWaitPoll(int rep, float acc_min = 1.
 	);
 	Message::SendSync(Message::Operation::REQUEST, buffer, size_written);
 
-	return data;
+	for (int j = 0; j < data.size(); j++)
+	{
+		std::ofstream output_file(std::to_string(j) + "_ACC_360_DEV.dat");
+		std::ostream_iterator<float> output_iterator(output_file, "\n");
+		std::copy(data[j].begin(), data[j].end(), output_iterator);
+	}
 }
 
 int main(int argc, char *argv[])
@@ -107,21 +112,20 @@ int main(int argc, char *argv[])
 
 	LOG_DEBUG("Got server max thread concurrency: %d", max_threads_srv);
 
-	/*size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_OnTestFibSeq, [] (DCS::u8* data) {
+	size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_OnTestFibSeq, [] (DCS::u8* data) {
 		LOG_DEBUG("FibEvent returned: %llu", *(DCS::u64*)data);
 	});
 
-	Message::SendAsync(Message::Operation::EVT_SUB, buffer, size_written);*/
+	Message::SendAsync(Message::Operation::EVT_SUB, buffer, size_written);
 
-	auto data = RunToWaitPoll(5, 2500.0f, 20000.0f);
-
-	for (int j = 0; j < data.size(); j++)
-	{
-		std::ofstream output_file(std::to_string(j) + "_ACC_360_DEV.dat");
-		std::ostream_iterator<float> output_iterator(output_file, "\n");
-		std::copy(data[j].begin(), data[j].end(), output_iterator);
-	}
+	//RunToWaitPoll(5, 2500.0f, 20000.0f);
 	
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
+	size_written = DCS::Registry::RemoveEvent(buffer, SV_EVT_OnTestFibSeq);
+
+	Message::SendAsync(Message::Operation::EVT_UNSUB, buffer, size_written);
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 	Client::StopThread(c);
