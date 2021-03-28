@@ -33,6 +33,8 @@ int main(int argc, char* argv[])
 
 	DCS::Network::Server::StartThread(connection);
 
+	DCS::CLI::Spin();
+
 	DCS::Network::Server::StopThread(connection, DCS::Network::Server::StopMode::WAIT);
 
 	DCS::Control::StopServices();

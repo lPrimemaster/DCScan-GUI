@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 
 	LOG_DEBUG("Got server max thread concurrency: %d", max_threads_srv);
 
-	size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_OnTestFibSeq, [] (DCS::u8* data) {
+	size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Network_Message_FibSeqEvt, [] (DCS::u8* data) {
 		LOG_DEBUG("FibEvent returned: %llu", *(DCS::u64*)data);
 	});
 
@@ -120,9 +120,9 @@ int main(int argc, char *argv[])
 
 	//RunToWaitPoll(5, 2500.0f, 20000.0f);
 	
-	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	std::this_thread::sleep_for(std::chrono::seconds(60));
 
-	size_written = DCS::Registry::RemoveEvent(buffer, SV_EVT_OnTestFibSeq);
+	size_written = DCS::Registry::RemoveEvent(buffer, SV_EVT_DCS_Network_Message_FibSeqEvt);
 
 	Message::SendAsync(Message::Operation::EVT_UNSUB, buffer, size_written);
 
