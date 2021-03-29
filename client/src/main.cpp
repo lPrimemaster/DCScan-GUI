@@ -97,38 +97,40 @@ int main(int argc, char *argv[])
 	Init();
 
 	Socket c = Client::Connect("127.0.0.1", 15777);
+	bool valid = Client::StartThread(c);
 
-	Client::StartThread(c);
+	if (valid)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		unsigned char buffer[1024];
+		auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+			SV_CALL_DCS_Threading_GetMaxHardwareConcurrency
+		);
 
-	unsigned char buffer[1024];
-	auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-		SV_CALL_DCS_Threading_GetMaxHardwareConcurrency
-	);
+		auto max_threads_srv_b = Message::SendSync(Message::Operation::REQUEST, buffer, size_written);
+		auto max_threads_srv = *(DCS::u16*)max_threads_srv_b.ptr;
 
-	auto max_threads_srv_b = Message::SendSync(Message::Operation::REQUEST, buffer, size_written);
-	auto max_threads_srv = *(DCS::u16*)max_threads_srv_b.ptr;
+		LOG_DEBUG("Got server max thread concurrency: %d", max_threads_srv);
 
-	LOG_DEBUG("Got server max thread concurrency: %d", max_threads_srv);
+		size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Network_Message_FibSeqEvt, [](DCS::u8* data) {
+			LOG_DEBUG("FibEvent returned: %llu", *(DCS::u64*)data);
+			});
 
-	size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Network_Message_FibSeqEvt, [] (DCS::u8* data) {
-		LOG_DEBUG("FibEvent returned: %llu", *(DCS::u64*)data);
-	});
+		Message::SendAsync(Message::Operation::EVT_SUB, buffer, size_written);
 
-	Message::SendAsync(Message::Operation::EVT_SUB, buffer, size_written);
+		//RunToWaitPoll(5, 2500.0f, 20000.0f);
 
-	//RunToWaitPoll(5, 2500.0f, 20000.0f);
-	
-	std::this_thread::sleep_for(std::chrono::seconds(60));
+		std::this_thread::sleep_for(std::chrono::seconds(5));
 
-	size_written = DCS::Registry::RemoveEvent(buffer, SV_EVT_DCS_Network_Message_FibSeqEvt);
+		size_written = DCS::Registry::RemoveEvent(buffer, SV_EVT_DCS_Network_Message_FibSeqEvt);
 
-	Message::SendAsync(Message::Operation::EVT_UNSUB, buffer, size_written);
+		Message::SendAsync(Message::Operation::EVT_UNSUB, buffer, size_written);
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-	Client::StopThread(c);
+		Client::StopThread(c);
+	}
 
 	Destroy();
 

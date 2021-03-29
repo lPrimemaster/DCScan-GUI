@@ -29,13 +29,11 @@ int main(int argc, char* argv[])
 
 	auto listen = DCS::Network::Server::Create(15777);
 
-	auto connection = DCS::Network::Server::WaitForConnection(listen);
-
-	DCS::Network::Server::StartThread(connection);
+	DCS::Network::Server::WaitForConnections(listen);
 
 	DCS::CLI::Spin();
 
-	DCS::Network::Server::StopThread(connection, DCS::Network::Server::StopMode::WAIT);
+	DCS::Network::Server::StopListening(listen);
 
 	DCS::Control::StopServices();
 
