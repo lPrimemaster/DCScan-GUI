@@ -15,6 +15,7 @@
 #include "hist_window.h"
 #include "histsett_window.h"
 #include "test_window.h"
+#include "connect_window.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -41,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	ads::CDockWidget* test_dock = new ads::CDockWidget("Test Window");
 	test_dock->setWidget(new TestWindow());
 
+	ads::CDockWidget* connect_dock = new ads::CDockWidget("Remote Control");
+	connect_dock->setWidget(new ConnectWindow());
+
 	auto view_menu = menuBar()->addMenu("View");
 	auto opt_menu = menuBar()->addMenu("Options");
 	opt_menu->addAction("Settings");
@@ -56,12 +60,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	view_menu->addAction(hist_dock->toggleViewAction());
 	view_menu->addAction(hist_sett_dock->toggleViewAction());
 	view_menu->addAction(test_dock->toggleViewAction());
+	view_menu->addAction(connect_dock->toggleViewAction());
 
     // Add the dock widget to the top dock widget area
     dock_manager->addDockWidget(ads::TopDockWidgetArea, log_dock);
     dock_manager->addDockWidget(ads::TopDockWidgetArea, hist_dock);
     dock_manager->addDockWidget(ads::RightDockWidgetArea, hist_sett_dock);
-    dock_manager->addDockWidget(ads::LeftDockWidgetArea, test_dock);
+	auto left_area = dock_manager->addDockWidget(ads::LeftDockWidgetArea, test_dock);
+	dock_manager->addDockWidgetTabToArea(connect_dock, left_area);
+	//dock_manager->addDockWidget(ads::LeftDockWidgetArea, connect_dock, left_area);
 }
 
 MainWindow::~MainWindow()

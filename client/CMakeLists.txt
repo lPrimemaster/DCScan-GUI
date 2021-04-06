@@ -32,6 +32,10 @@ add_executable(DCScan-Client #WIN32 # Disable console
 	src/windows/test_window.cpp # Test ui files import
 	src/windows/test_window.ui # Test ui files import
 
+	src/windows/connect_window.h # Test ui files import
+	src/windows/connect_window.cpp # Test ui files import
+	src/windows/connect_window.ui # Test ui files import
+
 	src/autogen_macros.h # Ui autogen friendly macros
 
 	${app_WINRC}

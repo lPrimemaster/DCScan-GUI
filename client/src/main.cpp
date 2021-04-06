@@ -11,6 +11,8 @@
 #include <QStyleFactory>
 #include <QFile>
 
+// TODO : Refactor windows folder structure
+
 int main(int argc, char *argv[])
 {
 	DCS::Utils::Logger::Init(DCS::Utils::Logger::Verbosity::DEBUG);
