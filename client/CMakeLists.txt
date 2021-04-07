@@ -16,6 +16,8 @@ set(CMAKE_PREFIX_PATH "D:/Qt/5.15.1/msvc2019_64")
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Charts REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Charts REQUIRED)
 
+qt5_add_resources(RESFILES res/res.qrc)
+
 add_executable(DCScan-Client #WIN32 # Disable console
 	src/main.cpp
 	src/windows/main_window.cpp
@@ -37,6 +39,8 @@ add_executable(DCScan-Client #WIN32 # Disable console
 	src/windows/connect_window.ui # Test ui files import
 
 	src/autogen_macros.h # Ui autogen friendly macros
+	
+	${RESFILES}
 
 	${app_WINRC}
 )

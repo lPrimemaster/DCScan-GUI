@@ -17,7 +17,7 @@
 #include "test_window.h"
 #include "connect_window.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 {
     dock_manager = new ads::CDockManager(this);
 
@@ -31,22 +31,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // as the dock widget content
     ads::CDockWidget* log_dock = new ads::CDockWidget("Log");
 	log_dock->setWidget(new LogWindow());
+	log_dock->setIcon(QIcon(":/png/log_window.png"));
+	log_dock->toggleViewAction()->setIcon(QIcon(":/png/log_window.png"));
 
 	ads::CDockWidget* hist_dock = new ads::CDockWidget("Spectrum Graph");
 	HistWindow* graph_window = new HistWindow();
 	hist_dock->setWidget(graph_window);
+	hist_dock->setIcon(QIcon(":/png/spectrum_window.png"));
+	hist_dock->toggleViewAction()->setIcon(QIcon(":/png/spectrum_window.png"));
 
 	ads::CDockWidget* hist_sett_dock = new ads::CDockWidget("Graph Settings");
 	hist_sett_dock->setWidget(new HistSettingsWindow(graph_window));
 
-	ads::CDockWidget* test_dock = new ads::CDockWidget("Test Window");
-	test_dock->setWidget(new TestWindow());
+	ads::CDockWidget* test_dock = new ads::CDockWidget("Debug Window");
+	test_dock->setWidget(new TestWindow(app));
+	test_dock->setIcon(QIcon(":/png/debug_window.png"));
+	test_dock->toggleViewAction()->setIcon(QIcon(":/png/debug_window.png"));
 
 	ads::CDockWidget* connect_dock = new ads::CDockWidget("Remote Control");
 	connect_dock->setWidget(new ConnectWindow());
+	connect_dock->setIcon(QIcon(":/png/remote_cont_window.png"));
+	connect_dock->toggleViewAction()->setIcon(QIcon(":/png/remote_cont_window.png"));
 
 	auto view_menu = menuBar()->addMenu("View");
+
 	auto opt_menu = menuBar()->addMenu("Options");
+	opt_menu->setIcon(QIcon());
 	opt_menu->addAction("Settings");
 
 	status_bar = new QStatusBar(this);

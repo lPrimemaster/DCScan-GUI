@@ -1,5 +1,5 @@
 /*
- * Default style sheet on Windows Platforms
+ * Default white style sheet
  */
 ads--CDockContainerWidget {
 	background: palette(dark);
@@ -11,15 +11,15 @@ ads--CDockContainerWidget ads--CDockSplitter::handle {
 
 ads--CDockAreaWidget {
 	background: palette(window);
-	border: 1px solid white;
+	border: 1px solid orange;
 }
 
 ads--CDockWidgetTab {
-	background: palette(window);
-	border-color: palette(light);
-	border-style: solid;
-	border-width: 0 1px 0 0;
-	padding: 0 0px;
+    background: #ffd7a6;
+    border-color: palette(dark);
+    border-style: solid;
+    border-width: 0 1px 0 0;
+    padding: 0 0px;
 }
 
 ads--CDockWidgetTab[activeTab="true"] {
@@ -28,11 +28,11 @@ ads--CDockWidgetTab[activeTab="true"] {
 }
 
 ads--CDockWidgetTab QLabel {
-	color: palette(dark);
+	color: palette(shadow);
 }
 
 ads--CDockWidgetTab[activeTab="true"] QLabel {
-	color: palette(foreground);
+    color: palette(shadow);
 }
 
 ads--CDockWidget {
@@ -75,4 +75,112 @@ ads--CDockAreaWidget ads--CDockAreaTitleBar
 	background: transparent;
 	border-bottom: 2px solid palette(highlight);
 	padding-bottom: 0px;
+}
+
+QMenu {
+    background: palette(window);
+}
+
+QMenu:selected {
+    background: palette(highlight);
+}
+
+QMenuBar {
+    background: palette(window);
+    color: black;
+}
+
+QMenuBar::item:selected {
+    background: palette(highlight);
+    color: white;
+}
+
+QTabBar::tab {
+    background: palette(light);
+    border: .5px solid gray;
+    padding: 3px 10px;
+}
+
+QTabBar::tab:selected {
+    background: palette(highlight);
+    border: 1px solid gray;
+    padding: 3px 10px;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px; /* make non-selected tabs look smaller */
+}
+
+QPushButton {
+    background-color: palette(window);
+    border: .5px solid orange;
+    padding: 3px 3px;
+}
+
+QPushButton:hover {
+    background-color: palette(light);
+}
+
+QPushButton:pressed {
+    background-color: palette(highlight);
+}
+
+QComboBox {
+    border: 1px solid gray;
+    border-radius: 0px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+}
+
+QComboBox:editable {
+    background: palette(light);
+}
+
+QComboBox:!editable, QComboBox::drop-down:editable {
+    background: palette(window);
+}
+
+/* QComboBox gets the "on" state when the popup is open */
+QComboBox:!editable:on, QComboBox::drop-down:editable:on {
+    background: palette(window);
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+    background-color: palette(dark);
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 1px;
+    border-left-color: darkgray;
+    border-left-style: solid; /* just a single line */
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+    border-image: url(:/svg/down_arrow.svg);
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+}
+
+QCheckBox::indicator:unchecked {
+    border-image: url(:/png/check_off.png);
+}
+
+QCheckBox::indicator:unchecked:hover {
+    border-image: url(:/png/check_off_h.png);
+}
+
+QCheckBox::indicator:checked {
+    border-image: url(:/png/check_on.png);
+}
+
+QCheckBox::indicator:checked:hover {
+    border-image: url(:/png/check_on_h.png);
 }

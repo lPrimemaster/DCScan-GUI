@@ -1,0 +1,17 @@
+<RCC>
+   <qresource prefix="/svg">
+      <file alias="down_arrow.svg">svg/down_arrow.svg</file>
+   </qresource>
+
+  <qresource prefix="/png">
+    <file alias="check_on.png">png/check_on.png</file>
+    <file alias="check_on_h.png">png/check_on_h.png</file>
+    <file alias="check_off.png">png/check_off.png</file>
+    <file alias="check_off_h.png">png/check_off_h.png</file>
+    <file alias="log_window.png">png/log_window.png</file>
+    <file alias="remote_cont_window.png">png/remote_cont_window.png</file>
+    <file alias="debug_window.png">png/debug_window.png</file>
+    <file alias="view_menu.png">png/view_menu.png</file>
+    <file alias="spectrum_window.png">png/spectrum_window.png</file>
+  </qresource>
+</RCC>

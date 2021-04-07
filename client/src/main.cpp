@@ -22,9 +22,37 @@ int main(int argc, char *argv[])
 	// Register custom signal data
 	qRegisterMetaType<GraphSettings>("GraphSettings");
 
-    MainWindow w;
+    MainWindow w(&a);
 
-	QFile f("../../../client/styles/default.css"); // TODO : In a proper env this needs to be replaced for a app recognized path
+	// TODO : Create a black color theme as well
+	QPalette pal; // White palette
+	/*pal.setColor(QPalette::Normal, QPalette::Window,		  QColor("#323232"));
+	pal.setColor(QPalette::Normal, QPalette::WindowText,	  QColor("#ffffff"));
+	pal.setColor(QPalette::Normal, QPalette::Text,			  QColor("#ffffff"));
+	pal.setColor(QPalette::Inactive, QPalette::Text,		  QColor("#ffffff"));
+	pal.setColor(QPalette::Normal, QPalette::Base,			  QColor("#9c9c9c"));
+	pal.setColor(QPalette::Normal, QPalette::AlternateBase,	  QColor("#9c9c9c"));
+	pal.setColor(QPalette::Inactive, QPalette::ToolTipBase,   QColor("#212121"));
+	pal.setColor(QPalette::Inactive, QPalette::ToolTipText,	  QColor("#ffffff"));
+	pal.setColor(QPalette::Normal, QPalette::PlaceholderText, QColor("#ffffff"));
+	pal.setColor(QPalette::Normal, QPalette::Button,		  QColor("#3aadde"));
+	pal.setColor(QPalette::Normal, QPalette::ButtonText,	  QColor("#ffffff"));
+	pal.setColor(QPalette::Normal, QPalette::BrightText,	  QColor("#ffffff"));*/
+
+	pal.setColor(QPalette::Normal, QPalette::Light,	   QColor("#a1a1a1"));
+	pal.setColor(QPalette::Normal, QPalette::Midlight, QColor("#808080"));
+	pal.setColor(QPalette::Normal, QPalette::Mid,	   QColor("#5c5c5c"));
+	pal.setColor(QPalette::Normal, QPalette::Dark,	   QColor("#333333"));
+	pal.setColor(QPalette::Normal, QPalette::Shadow,   QColor("#000000"));
+
+	pal.setColor(QPalette::Normal, QPalette::Highlight,		  QColor("#ed7e00"));
+	pal.setColor(QPalette::Normal, QPalette::HighlightedText, QColor("#000000"));
+	pal.setColor(QPalette::Normal, QPalette::Link,			  QColor("#ffffff"));
+	pal.setColor(QPalette::Normal, QPalette::LinkVisited,	  QColor("#ffffff"));
+
+	a.setPalette(pal);
+
+	QFile f("../../../client/styles/default.css");
 	if (!f.open(QFile::ReadOnly | QFile::Text))
 	{
 		LOG_ERROR("Failed to load stylesheet. Maybe location is wrong?");
@@ -40,6 +68,7 @@ int main(int argc, char *argv[])
 
 		QString s = in.readAll();
 		a.setStyleSheet(s);
+		f.close();
 	}
 
     w.show();

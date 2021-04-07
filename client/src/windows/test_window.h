@@ -23,9 +23,12 @@ class TestWindow : public QWidget
 	Q_OBJECT
 
 public:
-	TestWindow(QWidget* parent = nullptr);
+	TestWindow(QApplication* app, QWidget* parent = nullptr);
 	~TestWindow();
+
+	void applyStyle();
 
 private:
 	Ui::TestWindow* ui;
+	QApplication* a;
 };

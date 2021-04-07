@@ -15,11 +15,12 @@ ConnectWindow::ConnectWindow(QWidget* parent) : ui(new Ui::ConnectWindow)
 	(void)connect(ui->remote_connect_button, &QPushButton::clicked, this, &ConnectWindow::connectToServer);
 }
 
+// NOTE : This is just a test function
 void ConnectWindow::connectToServer()
 {
 	QString ip_add = ui->lineEdit->text() + "." + ui->lineEdit_2->text() + "." + ui->lineEdit_3->text() + "." + ui->lineEdit_4->text();
 
-	// TODO : Check ip validity
+	
 	auto connection = DCS::Network::Client::Connect(ip_add.toLatin1().constData(), 15777);
 
 	qDebug() << "Connect OK || SOCKET id = " << (uint)connection;
