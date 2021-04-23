@@ -47,13 +47,12 @@ struct GraphSettings
 	int bins_color_idx = 0;
 };
 
-// TODO : Change this to a main setting window with all settings?
 class HistSettingsWindow : public QWidget
 {
 	Q_OBJECT
 
 public:
-	HistSettingsWindow(HistWindow* hw, QWidget* parent = nullptr);
+	HistSettingsWindow(QWidget* parent = nullptr);
 	~HistSettingsWindow() = default;
 
 public slots:

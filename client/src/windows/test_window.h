@@ -16,6 +16,8 @@
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
 
+#include "main_window.h"
+
 UI_AUTOGEN(TestWindow)
 
 class TestWindow : public QWidget
@@ -23,12 +25,16 @@ class TestWindow : public QWidget
 	Q_OBJECT
 
 public:
-	TestWindow(QApplication* app, QWidget* parent = nullptr);
+	TestWindow(QWidget* parent = nullptr);
 	~TestWindow();
 
 	void applyStyle();
 
+	void overrideADSDefaultPerspective();
+
 private:
 	Ui::TestWindow* ui;
 	QApplication* a;
+
+	ads::CDockManager* manager;
 };

@@ -2,6 +2,8 @@
 #include "./ui_test_window.h"
 #include <QFile>
 #include <QTextStream>
+#include <QSettings>
+
 
 void TestWindow::applyStyle()
 {
@@ -18,13 +20,24 @@ void TestWindow::applyStyle()
 	f.close();
 }
 
-TestWindow::TestWindow(QApplication* app, QWidget* parent) : ui(new Ui::TestWindow)
+void TestWindow::overrideADSDefaultPerspective()
+{
+	QSettings s("ads_perspectives.ini", QSettings::Format::IniFormat);
+	manager->addPerspective("Default");
+	manager->savePerspectives(s);
+}
+
+TestWindow::TestWindow(QWidget* parent) : ui(new Ui::TestWindow)
 {
 	ui->setupUi(this);
 
-	a = app;
+	a = dynamic_cast<MainWindow*>(parent)->GetApp();
+
+	manager = dynamic_cast<MainWindow*>(parent)->GetDockManager();
 
 	(void)connect(ui->btn_reload_css, &QPushButton::clicked, this, &TestWindow::applyStyle);
+
+	(void)connect(ui->btn_override_perspective, &QPushButton::clicked, this, &TestWindow::overrideADSDefaultPerspective);
 }
 
 TestWindow::~TestWindow()

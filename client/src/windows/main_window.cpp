@@ -5,6 +5,7 @@
 #include <QProgressBar>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QSettings>
 
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
@@ -17,68 +18,89 @@
 #include "test_window.h"
 #include "connect_window.h"
 
+void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area)
+{
+	ads::CDockWidget* dock = new ads::CDockWidget(title);
+	dock->setWidget(window);
+	dock->setIcon(icon);
+	dock->toggleViewAction()->setIcon(icon);
+
+	auto pmenu = menuBar()->findChild<QMenu*>(menu);
+
+	auto it = menus.find(menu);
+
+	if(it == menus.end())
+	{
+		LOG_ERROR("Assigning window to a unexsting menu. Ignoring...");
+	}
+	else
+	{
+		it.value()->addAction(dock->toggleViewAction());
+	}
+
+	dock_manager->addDockWidgetTab(area, dock);
+
+	windows.insert(title, window);
+}
+
+void MainWindow::AddMenu(const QString& name)
+{
+	menus.insert(name, menuBar()->addMenu(name));
+}
+
 MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 {
-    dock_manager = new ads::CDockManager(this);
+	// Set globally usable app
+	this->app = app;
 
+	// Setup dock manager
+    dock_manager = new ads::CDockManager(this);
     ads::CDockManager::setConfigFlag(ads::CDockManager::FloatingContainerHasWidgetIcon, true);
 	ads::CDockManager::setConfigFlag(ads::CDockManager::DockAreaDynamicTabsMenuButtonVisibility, true);
 
 	// Disable style sheet, use own
 	dock_manager->setStyleSheet("");
 
-    // Create a dock widget with the title Label 1 and set the created label
-    // as the dock widget content
-    ads::CDockWidget* log_dock = new ads::CDockWidget("Log");
-	log_dock->setWidget(new LogWindow());
-	log_dock->setIcon(QIcon(":/png/log_window.png"));
-	log_dock->toggleViewAction()->setIcon(QIcon(":/png/log_window.png"));
+	// Add menus to top bar
+	AddMenu("View");
+	AddMenu("Options");
 
-	ads::CDockWidget* hist_dock = new ads::CDockWidget("Spectrum Graph");
-	HistWindow* graph_window = new HistWindow();
-	hist_dock->setWidget(graph_window);
-	hist_dock->setIcon(QIcon(":/png/spectrum_window.png"));
-	hist_dock->toggleViewAction()->setIcon(QIcon(":/png/spectrum_window.png"));
+	// Construct all windows
+	auto log_window  	  	   = new LogWindow(this);
+	auto log_window_icon  	   = QIcon(":/png/log_window.png");
 
-	ads::CDockWidget* hist_sett_dock = new ads::CDockWidget("Graph Settings");
-	hist_sett_dock->setWidget(new HistSettingsWindow(graph_window));
+	auto hist_window 	  	   = new HistWindow(this);
+	auto hist_window_icon  	   = QIcon(":/png/spectrum_window.png");
 
-	ads::CDockWidget* test_dock = new ads::CDockWidget("Debug Window");
-	test_dock->setWidget(new TestWindow(app));
-	test_dock->setIcon(QIcon(":/png/debug_window.png"));
-	test_dock->toggleViewAction()->setIcon(QIcon(":/png/debug_window.png"));
+	auto histSetts_window 	   = new HistSettingsWindow(this);
+	auto histSetts_window_icon = QIcon();
 
-	ads::CDockWidget* connect_dock = new ads::CDockWidget("Remote Control");
-	connect_dock->setWidget(new ConnectWindow());
-	connect_dock->setIcon(QIcon(":/png/remote_cont_window.png"));
-	connect_dock->toggleViewAction()->setIcon(QIcon(":/png/remote_cont_window.png"));
+	auto test_window           = new TestWindow(this);
+	auto test_window_icon      = QIcon(":/png/debug_window.png");
 
-	auto view_menu = menuBar()->addMenu("View");
+	auto remote_window         = new ConnectWindow(this);
+	auto remote_window_icon    = QIcon(":/png/remote_cont_window.png");
 
-	auto opt_menu = menuBar()->addMenu("Options");
-	opt_menu->setIcon(QIcon());
-	opt_menu->addAction("Settings");
+	// Add constructed windows to the default view
+	AddGenericWindow("Log"			 , log_window	   , log_window_icon      , "View", ads::BottomDockWidgetArea);
+	AddGenericWindow("Spectrum Graph", hist_window     , hist_window_icon     , "View", ads::TopDockWidgetArea);
+	AddGenericWindow("Graph Settings", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
+	AddGenericWindow("Debug Window"  , test_window     , test_window_icon     , "View", ads::LeftDockWidgetArea);
+	AddGenericWindow("Remote Control", remote_window   , remote_window_icon   , "View", ads::LeftDockWidgetArea);
 
+	// Setup a global status bar
 	status_bar = new QStatusBar(this);
 	status_bar->setSizeGripEnabled(true);
-
 	status_bar->showMessage("Ready.");
-
 	setStatusBar(status_bar);
 
-	view_menu->addAction(log_dock->toggleViewAction());
-	view_menu->addAction(hist_dock->toggleViewAction());
-	view_menu->addAction(hist_sett_dock->toggleViewAction());
-	view_menu->addAction(test_dock->toggleViewAction());
-	view_menu->addAction(connect_dock->toggleViewAction());
+	// Load user perspectives and set the default one active
+	QSettings s("ads_perspectives.ini", QSettings::Format::IniFormat);
+	dock_manager->loadPerspectives(s);
+	dock_manager->openPerspective("Default");
 
-    // Add the dock widget to the top dock widget area
-    dock_manager->addDockWidget(ads::TopDockWidgetArea, log_dock);
-    dock_manager->addDockWidget(ads::TopDockWidgetArea, hist_dock);
-    dock_manager->addDockWidget(ads::RightDockWidgetArea, hist_sett_dock);
-	auto left_area = dock_manager->addDockWidget(ads::LeftDockWidgetArea, test_dock);
-	dock_manager->addDockWidgetTabToArea(connect_dock, left_area);
-	//dock_manager->addDockWidget(ads::LeftDockWidgetArea, connect_dock, left_area);
+	// Maximize window on app start
+	showMaximized();
 }
 
 MainWindow::~MainWindow()

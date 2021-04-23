@@ -6,10 +6,11 @@
 #include <QCheckBox>
 
 #include "hist_window.h"
+#include "main_window.h"
 
 constexpr int SPINBOX_MAX = 0xFFFFFF;
 
-HistSettingsWindow::HistSettingsWindow(HistWindow* hw, QWidget* parent)
+HistSettingsWindow::HistSettingsWindow(QWidget* parent)
 {
 	// Set window layout
 	parent_layout = new QVBoxLayout();
@@ -40,15 +41,18 @@ HistSettingsWindow::HistSettingsWindow(HistWindow* hw, QWidget* parent)
 	parent_layout->addLayout(tab_bot);
 
 	// Configure output events
-	if (!hw)
+
+	auto hw = dynamic_cast<MainWindow*>(parent)->GetWindow<HistWindow>("Spectrum Graph");
+
+	if (hw == nullptr)
 	{
 		LOG_CRITICAL("Failed to establish link from [Graph Settings] to [Graph] windows.");
-		LOG_CRITICAL("Settings window will not function properly!!!");
+		LOG_CRITICAL("Settings window will not function properly");
 	}
 	else
 	{
 		(void)connect(this, &HistSettingsWindow::settingsChangedSig, hw, &HistWindow::updateAllSettings);
-		LOG_DEBUG("[Graph Settings] -> [Graph] link successful!");
+		LOG_DEBUG("[Graph Settings] -> [Graph] link successful");
 	}
 
 	// 'Axis' Tab settings

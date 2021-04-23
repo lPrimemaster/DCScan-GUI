@@ -39,11 +39,11 @@ int main(int argc, char *argv[])
 	pal.setColor(QPalette::Normal, QPalette::ButtonText,	  QColor("#ffffff"));
 	pal.setColor(QPalette::Normal, QPalette::BrightText,	  QColor("#ffffff"));*/
 
-	pal.setColor(QPalette::Normal, QPalette::Light,	   QColor("#a1a1a1"));
-	pal.setColor(QPalette::Normal, QPalette::Midlight, QColor("#808080"));
-	pal.setColor(QPalette::Normal, QPalette::Mid,	   QColor("#5c5c5c"));
-	pal.setColor(QPalette::Normal, QPalette::Dark,	   QColor("#333333"));
-	pal.setColor(QPalette::Normal, QPalette::Shadow,   QColor("#000000"));
+	pal.setColor(QPalette::Normal, QPalette::Light,	   		  QColor("#a1a1a1"));
+	pal.setColor(QPalette::Normal, QPalette::Midlight, 		  QColor("#808080"));
+	pal.setColor(QPalette::Normal, QPalette::Mid,	   		  QColor("#5c5c5c"));
+	pal.setColor(QPalette::Normal, QPalette::Dark,	   		  QColor("#333333"));
+	pal.setColor(QPalette::Normal, QPalette::Shadow,   		  QColor("#000000"));
 
 	pal.setColor(QPalette::Normal, QPalette::Highlight,		  QColor("#ed7e00"));
 	pal.setColor(QPalette::Normal, QPalette::HighlightedText, QColor("#000000"));
@@ -77,5 +77,4 @@ int main(int argc, char *argv[])
 	DCS::Utils::Logger::Destroy();
 
 	return retval;
-	return 0;
 }
