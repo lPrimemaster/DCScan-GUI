@@ -26,8 +26,11 @@ public:
 	ConnectWindow(QWidget* parent = nullptr);
 	~ConnectWindow();
 
+	void runNet();
+
 public slots:
 	void connectToServer();
+	void stopSplash();
 
 private:
 	Ui::ConnectWindow* ui;

@@ -1,7 +1,12 @@
 #include "connect_window.h"
 #include "./ui_connect_window.h"
 
+#include "../dialogs/connect_dialog.h"
+#include "../splash/loading.h"
+
 #include <qDebug>
+#include <QTimer>
+#include <QThreadPool>
 
 #include <DCS_Network/include/DCS_ModuleNetwork.h>
 
@@ -11,15 +16,18 @@ ConnectWindow::ConnectWindow(QWidget* parent) : ui(new Ui::ConnectWindow)
 
 	ui->setupUi(this);
 
+	// Auto delete via parenting
+	//ConnectDialog* cd = new ConnectDialog(this);
 	
-	(void)connect(ui->remote_connect_button, &QPushButton::clicked, this, &ConnectWindow::connectToServer);
+	//cd->setModal(true);
+	(void)connect(ui->remote_connect_button, SIGNAL(clicked()), this, SLOT(connectToServer()));
 }
 
-// NOTE : This is just a test function
-void ConnectWindow::connectToServer()
+void ConnectWindow::runNet()
 {
-	QString ip_add = ui->lineEdit->text() + "." + ui->lineEdit_2->text() + "." + ui->lineEdit_3->text() + "." + ui->lineEdit_4->text();
+	QString ip_add = ui->lineEdit->text();
 
+	LoadingSplash::SetWorkingStatus("Connecting to server...");
 	
 	auto connection = DCS::Network::Client::Connect(ip_add.toLatin1().constData(), 15777);
 
@@ -50,6 +58,22 @@ void ConnectWindow::connectToServer()
 	{
 		qDebug() << "Failed to connect to server at: " << ip_add;
 	}
+
+	LoadingSplash::Finish();
+}
+
+// NOTE : This is just a test function
+void ConnectWindow::connectToServer()
+{
+	LoadingSplash::Start(this);
+	LoadingSplash::SetWorkingStatus("Initializing...");
+
+	QThreadPool::globalInstance()->start(std::bind(&ConnectWindow::runNet, this));
+}
+
+void ConnectWindow::stopSplash()
+{
+	LoadingSplash::Finish();
 }
 
 ConnectWindow::~ConnectWindow()

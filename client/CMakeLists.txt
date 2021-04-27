@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_PREFIX_PATH "H:/Qt/5.15.1/msvc2019_64")
 set(CMAKE_PREFIX_PATH "D:/Qt/5.15.1/msvc2019_64")
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Charts REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Charts REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Charts Multimedia REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Charts Multimedia REQUIRED)
 
 qt5_add_resources(RESFILES res/res.qrc)
 
@@ -38,6 +38,11 @@ add_executable(DCScan-Client #WIN32 # Disable console
 	src/windows/connect_window.cpp # Test ui files import
 	src/windows/connect_window.ui # Test ui files import
 
+	src/dialogs/connect_dialog.h
+	src/dialogs/connect_dialog.ui
+
+	src/splash/loading.h
+
 	src/autogen_macros.h # Ui autogen friendly macros
 	
 	${RESFILES}
@@ -50,6 +55,7 @@ add_executable(DCScan-Client #WIN32 # Disable console
 target_link_libraries(DCScan-Client PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
 	Qt${QT_VERSION_MAJOR}::Charts
+	Qt${QT_VERSION_MAJOR}::Multimedia
     "${DCSMODULESAPI_LIBRARIES}"
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/qtadvanceddocking/lib/qtadvanceddocking_static.lib)
 

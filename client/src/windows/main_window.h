@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QTextBrowser>
 #include <QMap>
+#include <QStatusBar>
 
 #include <qtadvanceddocking/DockManager.h>
 
@@ -41,6 +42,16 @@ public:
             return nullptr;
         }
         return dynamic_cast<W*>(it.value());
+    }
+
+    /**
+     * @brief Display a status message in the man window's status bar.
+     * 
+     * @param value text to display. Period terminated preferencially.
+     */
+    inline void IssueStatusBarText(const QString& value)
+    {
+        status_bar->showMessage(value);
     }
 
 private:

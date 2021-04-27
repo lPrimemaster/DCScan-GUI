@@ -4,7 +4,6 @@
 #include <QToolButton>
 #include <QProgressBar>
 #include <QMenuBar>
-#include <QStatusBar>
 #include <QSettings>
 
 
@@ -61,43 +60,47 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	// Disable style sheet, use own
 	dock_manager->setStyleSheet("");
 
+	// Setup a global status bar
+	status_bar = new QStatusBar(this);
+	status_bar->setSizeGripEnabled(true);
+	setStatusBar(status_bar);
+	IssueStatusBarText("Loading windows...");
+
 	// Add menus to top bar
 	AddMenu("View");
 	AddMenu("Options");
 
 	// Construct all windows
+	// And add them to the default view
+	// TODO : Watch out for windows dependencies
 	auto log_window  	  	   = new LogWindow(this);
 	auto log_window_icon  	   = QIcon(":/png/log_window.png");
+	AddGenericWindow("Log"			 , log_window	   , log_window_icon      , "View", ads::BottomDockWidgetArea);
 
 	auto hist_window 	  	   = new HistWindow(this);
 	auto hist_window_icon  	   = QIcon(":/png/spectrum_window.png");
+	AddGenericWindow("Spectrum Graph", hist_window     , hist_window_icon     , "View", ads::TopDockWidgetArea);
 
 	auto histSetts_window 	   = new HistSettingsWindow(this);
 	auto histSetts_window_icon = QIcon();
+	AddGenericWindow("Graph Settings", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
 
 	auto test_window           = new TestWindow(this);
 	auto test_window_icon      = QIcon(":/png/debug_window.png");
+	AddGenericWindow("Debug Window"  , test_window     , test_window_icon     , "View", ads::LeftDockWidgetArea);
 
 	auto remote_window         = new ConnectWindow(this);
 	auto remote_window_icon    = QIcon(":/png/remote_cont_window.png");
-
-	// Add constructed windows to the default view
-	AddGenericWindow("Log"			 , log_window	   , log_window_icon      , "View", ads::BottomDockWidgetArea);
-	AddGenericWindow("Spectrum Graph", hist_window     , hist_window_icon     , "View", ads::TopDockWidgetArea);
-	AddGenericWindow("Graph Settings", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
-	AddGenericWindow("Debug Window"  , test_window     , test_window_icon     , "View", ads::LeftDockWidgetArea);
 	AddGenericWindow("Remote Control", remote_window   , remote_window_icon   , "View", ads::LeftDockWidgetArea);
 
-	// Setup a global status bar
-	status_bar = new QStatusBar(this);
-	status_bar->setSizeGripEnabled(true);
-	status_bar->showMessage("Ready.");
-	setStatusBar(status_bar);
+	IssueStatusBarText("Loading perspectives...");
 
 	// Load user perspectives and set the default one active
 	QSettings s("ads_perspectives.ini", QSettings::Format::IniFormat);
 	dock_manager->loadPerspectives(s);
 	dock_manager->openPerspective("Default");
+
+	IssueStatusBarText("Ready.");
 
 	// Maximize window on app start
 	showMaximized();

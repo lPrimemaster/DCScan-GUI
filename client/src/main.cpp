@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
 	// Register custom signal data
 	qRegisterMetaType<GraphSettings>("GraphSettings");
-
+	
     MainWindow w(&a);
 
 	// TODO : Create a black color theme as well

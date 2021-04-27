@@ -1,9 +1,14 @@
 <RCC>
-   <qresource prefix="/svg">
-      <file alias="down_arrow.svg">svg/down_arrow.svg</file>
-   </qresource>
+  <qresource prefix="/svg">
+    <file alias="down_arrow.svg">svg/down_arrow.svg</file>
+  </qresource>
+
+  <qresource prefix="/gif">
+    <file alias="loader.gif">gif/loader.gif</file>
+  </qresource>
 
   <qresource prefix="/png">
+    <file alias="warning.png">png/warning.png</file>
     <file alias="check_on.png">png/check_on.png</file>
     <file alias="check_on_h.png">png/check_on_h.png</file>
     <file alias="check_off.png">png/check_off.png</file>
@@ -13,5 +18,10 @@
     <file alias="debug_window.png">png/debug_window.png</file>
     <file alias="view_menu.png">png/view_menu.png</file>
     <file alias="spectrum_window.png">png/spectrum_window.png</file>
+    <file alias="splash.png">png/splash.png</file>
+  </qresource>
+
+  <qresource prefix="/sound">
+    <file alias="cerror.wav">sound/cerror.wav</file>
   </qresource>
 </RCC>
