@@ -59,6 +59,8 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
-    }
+        "xutility": "cpp",
+        "compare": "cpp"
+    },
+    "cmake.configureOnOpen": true
 }

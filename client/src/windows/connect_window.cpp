@@ -20,16 +20,23 @@ ConnectWindow::ConnectWindow(QWidget* parent) : ui(new Ui::ConnectWindow)
 	//ConnectDialog* cd = new ConnectDialog(this);
 	
 	//cd->setModal(true);
-	(void)connect(ui->remote_connect_button, SIGNAL(clicked()), this, SLOT(connectToServer()));
+
+	ConnectDialog* cd = new ConnectDialog(this);
+	cd->setModal(true);
+
+	(void)connect(ui->remote_connect_button, SIGNAL(clicked()), cd, SLOT(exec()));
+	(void)connect(cd, SIGNAL(credentialsSignal(QString, QString)), this, SLOT(connectToServer(QString, QString)));
 }
 
-void ConnectWindow::runNet()
+void ConnectWindow::runNet(QString username, QString password)
 {
 	QString ip_add = ui->lineEdit->text();
 
 	LoadingSplash::SetWorkingStatus("Connecting to server...");
 	
 	auto connection = DCS::Network::Client::Connect(ip_add.toLatin1().constData(), 15777);
+
+	DCS::Network::Client::Authenticate(connection, username.toLatin1().constData(), password.toLatin1().constData());
 
 	qDebug() << "Connect OK || SOCKET id = " << (uint)connection;
 
@@ -63,12 +70,12 @@ void ConnectWindow::runNet()
 }
 
 // NOTE : This is just a test function
-void ConnectWindow::connectToServer()
+void ConnectWindow::connectToServer(QString username, QString password)
 {
 	LoadingSplash::Start(this);
 	LoadingSplash::SetWorkingStatus("Initializing...");
 
-	QThreadPool::globalInstance()->start(std::bind(&ConnectWindow::runNet, this));
+	QThreadPool::globalInstance()->start(std::bind(&ConnectWindow::runNet, this, username, password));
 }
 
 void ConnectWindow::stopSplash()

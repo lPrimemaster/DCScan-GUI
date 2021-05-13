@@ -26,10 +26,11 @@ public:
 	ConnectWindow(QWidget* parent = nullptr);
 	~ConnectWindow();
 
-	void runNet();
+private:
+	void runNet(QString username, QString password);
 
 public slots:
-	void connectToServer();
+	void connectToServer(QString username, QString password);
 	void stopSplash();
 
 private:

@@ -72,7 +72,6 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 
 	// Construct all windows
 	// And add them to the default view
-	// TODO : Watch out for windows dependencies
 	auto log_window  	  	   = new LogWindow(this);
 	auto log_window_icon  	   = QIcon(":/png/log_window.png");
 	AddGenericWindow("Log"			 , log_window	   , log_window_icon      , "View", ads::BottomDockWidgetArea);

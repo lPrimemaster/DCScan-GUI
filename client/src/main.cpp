@@ -11,8 +11,6 @@
 #include <QStyleFactory>
 #include <QFile>
 
-// TODO : Refactor windows folder structure
-
 int main(int argc, char *argv[])
 {
 	DCS::Utils::Logger::Init(DCS::Utils::Logger::Verbosity::DEBUG);
@@ -21,7 +19,7 @@ int main(int argc, char *argv[])
 
 	// Register custom signal data
 	qRegisterMetaType<GraphSettings>("GraphSettings");
-	
+
     MainWindow w(&a);
 
 	// TODO : Create a black color theme as well

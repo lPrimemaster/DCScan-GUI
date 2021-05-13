@@ -1,6 +1,7 @@
 #include <iostream>
 #include <DCS_Network/include/DCS_ModuleNetwork.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
+#include <DCS_Core/include/DCS_ModuleCore.h>
 
 #include <atomic>
 
