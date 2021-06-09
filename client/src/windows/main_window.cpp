@@ -82,7 +82,7 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 
 	auto histSetts_window 	   = new HistSettingsWindow(this);
 	auto histSetts_window_icon = QIcon();
-	AddGenericWindow("Graph Settings", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
+	AddGenericWindow("Graph Details", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
 
 	auto test_window           = new TestWindow(this);
 	auto test_window_icon      = QIcon(":/png/debug_window.png");

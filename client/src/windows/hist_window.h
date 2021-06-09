@@ -10,6 +10,8 @@
 #include <QValueAxis>
 #include <QPair>
 
+#include <atomic>
+
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
@@ -26,10 +28,16 @@ public:
 
 	~HistWindow();
 
+	const int getMaxBins() const
+	{
+		return max_n_bins;
+	}
+
 protected:
 	void mouseMoveEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
 	void mousePressEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
 	void mouseReleaseEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+	void mouseDoubleClickEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
 
 private:
 	QPointF getSeriesCoordFromChartCoord(const QPointF& chartPos, QtCharts::QAbstractSeries* series) const;
@@ -44,12 +52,12 @@ public slots:
 	void setAxisBinRange(int nbins);
 	void updateAllSettings(GraphSettings settings);
 	void updateBin(int idx);
-	void adjustGraphAxisRange();
+	void adjustGraphAxisRange(bool auto_adj);
 
 signals:
 	void changeAxisBinSig(int nbins);
 	void incrementBinValueSig(int idx);
-
+	void changeSelectionSig(int bin, int count);
 
 private:
 	qreal barMaximum();
@@ -62,6 +70,8 @@ private:
 	unsigned max_n_bins;
 	unsigned max_bin_h;
 
+	int selected_bin = 0;
+
 	QtCharts::QValueAxis* axis_x;
 	QtCharts::QValueAxis* axis_y;
 
@@ -69,5 +79,11 @@ private:
 	QPoint origin_rb;
 	bool mouse_holding = false;
 
+	QColor gcolor;
+
 	std::thread* nt = nullptr;
+	std::thread* update_auto_axis = nullptr;
+	std::atomic<bool> auto_adjust_on = false;
+
+	QGraphicsRectItem* selected_bar_rect = nullptr;
 };

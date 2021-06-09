@@ -116,6 +116,43 @@ void HistWindow::mouseReleaseEvent(QMouseEvent* event)
 	QChartView::mouseReleaseEvent(event);
 }
 
+void HistWindow::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	if (event->button() == Qt::LeftButton)
+    {
+		auto ngi = qgraphicsitem_cast<QGraphicsRectItem*>(this->itemAt(lastMousePos.toPoint()));
+
+		if((ngi == nullptr || selected_bar_rect != ngi) && selected_bar_rect != nullptr)
+		{
+			QBrush b = selected_bar_rect->brush();
+			b.setColor(gcolor);
+			selected_bar_rect->setBrush(b);
+			selected_bar_rect->update();
+			selected_bar_rect = nullptr;
+			selected_bin = -1;
+			emit changeSelectionSig(selected_bin, 0);
+		}
+
+		selected_bar_rect = ngi;
+		
+		if(selected_bar_rect != nullptr)
+		{
+			selected_bin = std::round(getSeriesCoordFromChartCoord(lastMousePos, bar_series).x());
+			selected_bin = selected_bin > max_n_bins ? max_n_bins : selected_bin < 0 ? 0 : selected_bin;
+			int current_val = static_cast<int>(bar_series->barSets()[0]->at(selected_bin));
+
+			QBrush b = selected_bar_rect->brush();
+			b.setColor(Qt::red);
+			selected_bar_rect->setBrush(b);
+			selected_bar_rect->update();
+
+			emit changeSelectionSig(selected_bin, current_val);
+		}
+    }
+
+	QChartView::mouseDoubleClickEvent(event);
+}
+
 HistWindow::~HistWindow()
 {
 	delete chart;
@@ -164,11 +201,17 @@ void HistWindow::updateAllSettings(GraphSettings settings)
 
 	// Change bars color - Assume only one set at all times
 	bar_series->barSets()[0]->setColor(settings.bins_color);
+	gcolor = settings.bins_color;
 }
 
 void HistWindow::updateBin(int idx)
 {
 	auto s = bar_series->barSets()[0];
+
+	if(idx == selected_bin)
+	{
+        emit changeSelectionSig(selected_bin, static_cast<int>(s->at(idx) + 1));
+	}
 
 	if (idx >= s->count())
 	{
@@ -180,13 +223,36 @@ void HistWindow::updateBin(int idx)
 	}
 }
 
-void HistWindow::adjustGraphAxisRange()
+void HistWindow::adjustGraphAxisRange(bool auto_adj)
 {
-	qreal max_y = barMaximum();
-	int max_x = bar_series->barSets()[0]->count();
+	if(auto_adj)
+	{
+		auto_adjust_on.store(true);
+		update_auto_axis = new std::thread([&]() -> void { 
+			while(auto_adjust_on.load())
+			{
+				qreal max_y = barMaximum() + 10; // Padding
+				axis_y->setRange(0, max_y);
+			}
+		});
+	}
+	else
+	{
+		auto_adjust_on.store(false);
 
-	axis_x->setRange(0, max_x);
-	axis_y->setRange(0, max_y);
+		if(update_auto_axis != nullptr)
+		{
+			update_auto_axis->join();
+			delete update_auto_axis;
+			update_auto_axis = nullptr;
+		}
+
+		qreal max_y = barMaximum() + 10; // Padding
+		//int max_x = bar_series->barSets()[0]->count();
+
+		//axis_x->setRange(0, max_x);
+		axis_y->setRange(0, max_y);
+	}
 }
 
 qreal HistWindow::barMaximum()

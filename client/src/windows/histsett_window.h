@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
+#include <QCheckBox>
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
@@ -62,6 +63,8 @@ public slots:
 	void updateStatusAcqRunning(bool state);
 	void updateGraphView(bool auto_adj);
 
+	void updateSelection(int bin, int count);
+
 signals:
 	void settingsChangedSig(GraphSettings settings);
 	void axisViewAdjustSig(bool auto_adj);
@@ -74,6 +77,10 @@ private:
 	{
 		QSpinBox* max_bin_spinBox = nullptr;
 		QComboBox* bin_color_comboBox = nullptr;
+		QLabel* bin_selected = nullptr;
+		QLabel* bin_count = nullptr;
+		QLabel* bin_time = nullptr;
+		QLabel* bin_angle = nullptr;
 	}widgets;
 
 	GraphSettings settings;
@@ -81,6 +88,7 @@ private:
 private:
 	QHBoxLayout* tab_bot;
 	QVBoxLayout* parent_layout;
+	QCheckBox* auto_reset_barGraph_window;
 
 	QLabel* warning_label;
 };
