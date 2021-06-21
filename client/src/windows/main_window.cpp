@@ -16,6 +16,7 @@
 #include "histsett_window.h"
 #include "test_window.h"
 #include "connect_window.h"
+#include "freejog_window.h"
 
 void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area)
 {
@@ -91,6 +92,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto remote_window         = new ConnectWindow(this);
 	auto remote_window_icon    = QIcon(":/png/remote_cont_window.png");
 	AddGenericWindow("Remote Control", remote_window   , remote_window_icon   , "View", ads::LeftDockWidgetArea);
+
+	auto freejog_window         = new FreejogWindow(this);
+	auto freejog_window_icon    = QIcon(":/png/freejog_window.png");
+	AddGenericWindow("Free Jog Control", freejog_window , freejog_window_icon , "View", ads::LeftDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

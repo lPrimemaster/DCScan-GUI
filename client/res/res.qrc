@@ -19,6 +19,7 @@
     <file alias="view_menu.png">png/view_menu.png</file>
     <file alias="spectrum_window.png">png/spectrum_window.png</file>
     <file alias="splash.png">png/splash.png</file>
+    <file alias="freejog_window.png">png/freejog_window.png</file>
   </qresource>
 
   <qresource prefix="/sound">

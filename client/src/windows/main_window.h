@@ -4,6 +4,7 @@
 #include <QTextBrowser>
 #include <QMap>
 #include <QStatusBar>
+#include <QLabel>
 
 #include <qtadvanceddocking/DockManager.h>
 
@@ -54,6 +55,29 @@ public:
         status_bar->showMessage(value);
     }
 
+    template<typename W>
+    inline W* GetStatusWidget(const QString& name)
+    {
+        auto it = status_widgets.find(name);
+        if(it == status_widgets.end())
+        {
+            LOG_ERROR("Could not find status widget named %s.", name.toLatin1().toStdString().c_str());
+            return nullptr;
+        }
+        return dynamic_cast<W*>(it.value());
+    }
+
+    inline void AddStatusWidget(const QString& name, QWidget* w)
+    {
+        status_widgets.insert(name, w);
+        status_bar->addPermanentWidget(w);
+    }
+
+    inline void AdjustStatus()
+    {
+        status_bar->adjustSize();
+    }
+
 private:
     void AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area);
     void AddMenu(const QString& name);
@@ -64,6 +88,8 @@ private:
     QMap<QString, QMenu*> menus;
 
     QMap<QString, QWidget*> windows;
+
+    QMap<QString, QWidget*> status_widgets;
 
     QApplication* app;
 };

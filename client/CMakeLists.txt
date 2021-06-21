@@ -38,8 +38,14 @@ add_executable(DCScan-Client #WIN32 # Disable console
 	src/windows/connect_window.cpp # Test ui files import
 	src/windows/connect_window.ui # Test ui files import
 
+	src/windows/freejog_window.h
+	src/windows/freejog_window.cpp
+	src/windows/freejog_window.ui
+
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui
+
+	src/extras/qindicator.h
 
 	src/splash/loading.h
 

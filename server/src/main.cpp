@@ -16,6 +16,9 @@ int main(int argc, char* argv[])
 	// Initialize control services
 	DCS::Control::StartServices();
 
+	// Initialize acquisition services
+	DCS::DAQ::Init();
+
 	std::atomic<bool> stop = false;
 
 	// std::thread t([&] { 
@@ -35,6 +38,8 @@ int main(int argc, char* argv[])
 	DCS::CLI::Spin();
 
 	DCS::Network::Server::StopListening(listen);
+
+	DCS::DAQ::Terminate();
 
 	DCS::Control::StopServices();
 
