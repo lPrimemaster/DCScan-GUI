@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(DCScan-GUI LANGUAGES CXX)
 
+option(DEBUG_BUILD "Build in debug mode." OFF)
+
 # Common API for client and server
 find_package(DCSModulesAPI CONFIG REQUIRED)
 
