@@ -15,9 +15,11 @@ class LoadingSplash : public QSplashScreen
 {
 	Q_OBJECT
 
-public:
+private:
 	LoadingSplash(QWidget* parent = nullptr) : QSplashScreen(parent)
     {
+        (void)connect(this, &LoadingSplash::changeDisplayMessage, this, &LoadingSplash::setWorkingStatus);
+
         setWindowModality(Qt::WindowModal);
         this->installEventFilter(this);
 
@@ -56,26 +58,30 @@ public:
         this->removeEventFilter(this);
     }
 
-    static void Start(QWidget* parent = nullptr)
+public:
+    static LoadingSplash* Start(QWidget* parent = nullptr)
     {
         if(ls == nullptr)
         {
             ls = new LoadingSplash(parent);
             ls->show();
+            return ls;
         }
         else
         {
             LOG_WARNING("Trying to display LoadingSplash multiple times is not allowed.");
+            return nullptr;
         }
     }
 
-    static void SetWorkingStatus(const QString& value)
+public slots:
+    void setWorkingStatus(const QString& value)
     {
         if(ls)
             ls->status->setText(value);
     }
 
-    static void Finish()
+    void finishExec()
     {
         if(ls)
         {
@@ -84,6 +90,9 @@ public:
             ls = nullptr;
         }
     }
+
+signals:
+    void changeDisplayMessage(QString);
 
 protected:
     bool eventFilter(QObject *target, QEvent *event) override

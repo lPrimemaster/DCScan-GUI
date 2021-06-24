@@ -34,7 +34,12 @@ public slots:
 	void enableFreejog(bool e);
 	void resetSlider1();
 	void resetSlider2();
-	void log_test();
+
+	void moveEngine1(int val);
+	void moveEngine2(int val);
+
+	void updateAcc();
+	void updateVel();
 
 private:
 	Ui::FreejogWindow* ui;

@@ -32,9 +32,12 @@ public:
 		(void)connect(ui->cb_verbosity, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVerbosity(int)));
 		(void)connect(ui->btn_clearLog, SIGNAL(clicked()), ui->text_log, SLOT(clear()));
 
-	};
+	}
 
-	~LogWindow() {  };
+	~LogWindow() 
+	{ 
+		DCS::Utils::Logger::SetLogWriteCallback(nullptr, nullptr); 
+	}
 
 	inline static void log_callback(DCS::Utils::String msg, DCS::Utils::Logger::Verbosity v, void* ptr)
 	{

@@ -75,14 +75,11 @@ void ConnectWindow::changeSettings(bool v)
 	}
 }
 
-void ConnectWindow::runNet(QString username, QString password)
+static void ConnectNet(QString username, QString password, QString ip, QString port, DCS::Network::Socket socket, ConnectWindow* window, LoadingSplash* splash)
 {
-	QString ip_add = ui->lineEdit->text();
-	QString port = ui->lineEdit_2->text();
+	emit splash->changeDisplayMessage("Connecting to server...");
 
-	LoadingSplash::SetWorkingStatus("Connecting to server...");
-
-	socket = DCS::Network::Client::Connect(ip_add.toLatin1().constData(), port.toInt());
+	socket = DCS::Network::Client::Connect(ip.toLatin1().constData(), port.toInt());
 
 	DCS::Network::Client::Authenticate(socket, username.toLatin1().constData(), password.toLatin1().constData());
 
@@ -90,12 +87,12 @@ void ConnectWindow::runNet(QString username, QString password)
 
 	if (DCS::Network::Client::StartThread(socket))
 	{
-		net_connected = true;
-		qDebug() << "Connected at: " << ip_add;
+		window->setNetworkConnected(true);
+		qDebug() << "Connected at: " << ip;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-		unsigned char buffer[1024];
+		unsigned char buffer[4096];
 		auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
 			SV_CALL_DCS_Threading_GetMaxHardwareConcurrency
 		);
@@ -106,41 +103,54 @@ void ConnectWindow::runNet(QString username, QString password)
 		auto max_threads_srv = *(DCS::u16*)max_threads_srv_b.ptr;
 
 		qDebug() << "Got server max thread concurrency: " << max_threads_srv;
+
+		DCS::DAQ::ChannelLimits l;
+		l.min = -10.0;
+		l.max =  10.0;
+		auto size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString, DCS::Utils::BasicString, DCS::DAQ::ChannelRef, DCS::DAQ::ChannelLimits>(buffer, SV_CALL_DCS_DAQ_NewAIVChannel, 
+            { "Channel0Name" }, { "PXI_Slot2/ai0" }, DCS::DAQ::ChannelRef::Default, l);
+
+		DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
+
 		qDebug() << "Connection established!";
-		emit connectionChanged(true);
+		emit window->connectionChanged(true);
 	}
 	else
 	{
-		net_connected = false;
-		qDebug() << "Failed to connect to server at: " << ip_add;
+		window->setNetworkConnected(false);
+		qDebug() << "Failed to connect to server at: " << ip;
 	}
-
-	//LoadingSplash::Finish();
 }
 
 void ConnectWindow::connectToServer(QString username, QString password)
 {
-	// TODO : Fix this!
-	//LoadingSplash::Start(this);
-	//LoadingSplash::SetWorkingStatus("Initializing...");
+	auto ss = LoadingSplash::Start(this);
+	SimpleThread *workerThread = new SimpleThread(std::bind(&ConnectNet, username, password, ui->lineEdit->text(), ui->lineEdit_2->text(), socket, this, ss), this);
+    (void)connect(workerThread, &SimpleThread::jobDone, ss, &LoadingSplash::finishExec);
+    (void)connect(workerThread, &SimpleThread::finished, workerThread, &QObject::deleteLater);
+    workerThread->start();
+}
 
-	QThreadPool::globalInstance()->start(std::bind(&ConnectWindow::runNet, this, username, password));
+static void DisconnectLocal(DCS::Network::Socket socket)
+{
+	DCS::Network::Client::StopThread(socket);
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 }
 
 void ConnectWindow::disconnectFromServer()
 {
+	// TODO : Cancel any jobs if they are running
 	if(net_connected)
 	{
 		net_connected = false;
 		emit connectionChanged(false);
-		DCS::Network::Client::StopThread(socket);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		auto ss = LoadingSplash::Start(this);
+		ss->setWorkingStatus("Disconnecting from server...");
+		SimpleThread *workerThread = new SimpleThread(std::bind(&DisconnectLocal, socket), this);
+		(void)connect(workerThread, &SimpleThread::jobDone, ss, &LoadingSplash::finishExec);
+		(void)connect(workerThread, &SimpleThread::finished, workerThread, &QObject::deleteLater);
+		workerThread->start();
 	}
-}
-
-void ConnectWindow::stopSplash()
-{
-	LoadingSplash::Finish();
 }
 
 ConnectWindow::~ConnectWindow()

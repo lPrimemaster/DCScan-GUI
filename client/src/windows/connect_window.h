@@ -19,6 +19,7 @@
 
 #include "../dialogs/connect_dialog.h"
 #include "../extras/qindicator.h"
+#include "../utils/worker.h"
 
 UI_AUTOGEN(ConnectWindow)
 
@@ -32,14 +33,17 @@ public:
 
 	bool isNetworkConnected();
 
+	void setNetworkConnected(bool value)
+	{
+		net_connected = value;
+	}
+
 private:
-	void runNet(QString username, QString password);
 	void enableLayout(bool e);
 
 public slots:
 	void connectToServer(QString username, QString password);
 	void disconnectFromServer();
-	void stopSplash();
 	void changeSettings(bool v);
 
 signals:

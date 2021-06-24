@@ -9,9 +9,14 @@ FreejogWindow::FreejogWindow(QWidget* parent) : ui(new Ui::FreejogWindow)
     ui->warning_msg->setText("Free motion is disabled.\nConnect to server to enable.");
     enableFreejog(false);
 
-    (void)connect(ui->t1_slider, SIGNAL(valueChanged(int)), this, SLOT(log_test()));
+    (void)connect(ui->t1_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine1(int)));
+    (void)connect(ui->t2_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine2(int)));
+
     (void)connect(ui->t1_slider, SIGNAL(sliderReleased()), this, SLOT(resetSlider1()));
     (void)connect(ui->t2_slider, SIGNAL(sliderReleased()), this, SLOT(resetSlider2()));
+
+    (void)connect(ui->doubleSpinBox_3, SIGNAL(editingFinished()), this, SLOT(updateVel()));
+    (void)connect(ui->doubleSpinBox_4, SIGNAL(editingFinished()), this, SLOT(updateAcc()));
 }
 
 FreejogWindow::~FreejogWindow()
@@ -19,9 +24,166 @@ FreejogWindow::~FreejogWindow()
 
 }
 
-void FreejogWindow::log_test()
+void FreejogWindow::updateAcc()
 {
-    qDebug() << "Did it just dragged?";
+    double acc = ui->doubleSpinBox_4->value();
+    QString values = 
+         "1AU" + QString::number(acc) + 
+        ";1AC" + QString::number(acc) +
+        ";2AU" + QString::number(acc) + 
+        ";2AC" + QString::number(acc) + ";";
+
+    DCS::Utils::BasicString str;
+    memcpy(str.buffer, values.toStdString().c_str(), values.toStdString().size() + 1);
+    LOG_DEBUG("Updating acceleration: %s.", str.buffer);
+
+    unsigned char buffer[4096];
+    auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        SV_CALL_DCS_Control_IssueGenericCommand,
+        DCS::Control::UnitTarget::ESP301,
+        str
+    );
+
+    DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+}
+
+void FreejogWindow::updateVel()
+{
+    double vel = ui->doubleSpinBox_3->value();
+    QString values = 
+         "1VU" + QString::number(vel) + 
+        ";2VU" + QString::number(vel) + ";";
+
+    DCS::Utils::BasicString str;
+    memcpy(str.buffer, values.toStdString().c_str(), values.toStdString().size() + 1);
+    LOG_DEBUG("Updating velocity: %s.", str.buffer);
+
+    unsigned char buffer[4096];
+    auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        SV_CALL_DCS_Control_IssueGenericCommand,
+        DCS::Control::UnitTarget::ESP301,
+        str
+    );
+
+    DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+}
+
+void FreejogWindow::moveEngine1(int val)
+{
+    if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
+    {
+        QString cmd = "1VA" + QString::number((ui->doubleSpinBox_3->value() / 5.0) * abs(val)) + ";";
+        unsigned char buffer[4096];
+
+        if(val > 0)
+        {
+            cmd += "1PR+360;"; // Move 360 deg relative to pos
+
+            DCS::Utils::BasicString str;
+            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::ESP301,
+                str
+            );
+        
+            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        }
+        else if(val == 0)
+        {
+            cmd = "1ST;";
+
+            DCS::Utils::BasicString str;
+            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::ESP301,
+                str
+            );
+        
+            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        }
+        else
+        {
+            cmd += "1PR-360;"; // Move 360 deg relative to pos
+
+            DCS::Utils::BasicString str;
+            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::ESP301,
+                str
+            );
+        
+            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        }
+    }
+    else
+    {
+        LOG_ERROR("Cannot move engine 1: acceleration or velocity value is zero.");
+    }
+}
+
+void FreejogWindow::moveEngine2(int val)
+{
+    if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
+    {
+        QString cmd = "2VA" + QString::number((ui->doubleSpinBox_3->value() / 5.0) * abs(val)) + ";";
+        unsigned char buffer[4096];
+
+        if(val > 0)
+        {
+            cmd += "2PR+360;"; // Move 360 deg relative to pos
+
+            DCS::Utils::BasicString str;
+            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::ESP301,
+                str
+            );
+        
+            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        }
+        else if(val == 0)
+        {
+            cmd = "2ST;";
+
+            DCS::Utils::BasicString str;
+            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::ESP301,
+                str
+            );
+        
+            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        }
+        else
+        {
+            cmd += "2PR-360;"; // Move 360 deg relative to pos
+
+            DCS::Utils::BasicString str;
+            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::ESP301,
+                str
+            );
+        
+            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        }
+    }
+    else
+    {
+        LOG_ERROR("Cannot move engine 2: acceleration or velocity value is zero.");
+    }
 }
 
 void FreejogWindow::resetSlider1()
