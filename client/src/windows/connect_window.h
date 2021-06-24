@@ -12,6 +12,8 @@
 #include <QLineEdit>
 #include <QLabel>
 
+#include <mutex>
+
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
@@ -35,6 +37,7 @@ public:
 
 	void setNetworkConnected(bool value)
 	{
+		std::lock_guard<std::mutex> lock(net_mtx);
 		net_connected = value;
 	}
 
@@ -55,5 +58,7 @@ private:
 	QIndicator* connection_status;
 
 	bool net_connected = false;
+	std::mutex net_mtx;
+
 	DCS::Network::Socket socket;
 };

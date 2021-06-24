@@ -20,6 +20,7 @@
     <file alias="spectrum_window.png">png/spectrum_window.png</file>
     <file alias="splash.png">png/splash.png</file>
     <file alias="freejog_window.png">png/freejog_window.png</file>
+    <file alias="position_window.png">png/position_window.png</file>
   </qresource>
 
   <qresource prefix="/sound">

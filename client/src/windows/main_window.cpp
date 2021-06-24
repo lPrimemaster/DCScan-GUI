@@ -17,6 +17,7 @@
 #include "test_window.h"
 #include "connect_window.h"
 #include "freejog_window.h"
+#include "position_window.h"
 
 void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area)
 {
@@ -96,6 +97,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto freejog_window         = new FreejogWindow(this);
 	auto freejog_window_icon    = QIcon(":/png/freejog_window.png");
 	AddGenericWindow("Free Jog Control", freejog_window , freejog_window_icon , "View", ads::LeftDockWidgetArea);
+
+	auto position_window         = new PositionWindow(this);
+	auto position_window_icon    = QIcon(":/png/position_window.png");
+	AddGenericWindow("Positioning Display", position_window , position_window_icon , "View", ads::LeftDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

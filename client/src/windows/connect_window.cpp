@@ -44,6 +44,7 @@ ConnectWindow::ConnectWindow(QWidget* parent) : ui(new Ui::ConnectWindow)
 
 bool ConnectWindow::isNetworkConnected()
 {
+	std::lock_guard<std::mutex> lock(net_mtx);
 	return net_connected;
 }
 

@@ -47,6 +47,10 @@ set(SOURCE
 	src/windows/freejog_window.cpp
 	src/windows/freejog_window.ui
 
+	src/windows/position_window.h
+	src/windows/position_window.cpp
+	src/windows/position_window.ui
+
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui
 
