@@ -8,6 +8,7 @@
   </qresource>
 
   <qresource prefix="/png">
+	<file alias="todo.png">png/todo.png</file>
     <file alias="warning.png">png/warning.png</file>
     <file alias="check_on.png">png/check_on.png</file>
     <file alias="check_on_h.png">png/check_on_h.png</file>

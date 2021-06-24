@@ -43,8 +43,66 @@ void PositionWindow::update()
         
         auto pos2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
+        // Ask for engines velocity
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::ESP301,
+                DCS::Utils::BasicString{ "1VA?" }
+            );
+        
+        auto vel1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::ESP301,
+                DCS::Utils::BasicString{ "2VA?" }
+            );
+        
+        auto vel2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        // Ask for step engines position
+        // TODO : Check the connections and the motion directions
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::PMC8742,
+                DCS::Utils::BasicString{ "0>1TP?" }
+            );
+        
+        auto stepX1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::PMC8742,
+                DCS::Utils::BasicString{ "0>2TP?" }
+            );
+        
+        auto stepY1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::PMC8742,
+                DCS::Utils::BasicString{ "1>1TP?" }
+            );
+        
+        auto stepX2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::PMC8742,
+                DCS::Utils::BasicString{ "1>2TP?" }
+            );
+        
+        auto stepY2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
         ui->doubleSpinBox_2->setValue(atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer));
         ui->doubleSpinBox_3->setValue(atof((*(DCS::Utils::BasicString*)pos2.ptr).buffer));
+        ui->doubleSpinBox_4->setValue(atof((*(DCS::Utils::BasicString*)vel1.ptr).buffer));
+        ui->doubleSpinBox_5->setValue(atof((*(DCS::Utils::BasicString*)vel2.ptr).buffer));
+
+        ui->spinBox_6->setValue(atoi((*(DCS::Utils::BasicString*)stepX1.ptr).buffer));
+        ui->spinBox_8->setValue(atoi((*(DCS::Utils::BasicString*)stepY1.ptr).buffer));
+        ui->spinBox_7->setValue(atoi((*(DCS::Utils::BasicString*)stepX2.ptr).buffer));
+        ui->spinBox_9->setValue(atoi((*(DCS::Utils::BasicString*)stepY2.ptr).buffer));
     }
 }
 

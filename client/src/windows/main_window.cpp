@@ -100,7 +100,7 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 
 	auto position_window         = new PositionWindow(this);
 	auto position_window_icon    = QIcon(":/png/position_window.png");
-	AddGenericWindow("Positioning Display", position_window , position_window_icon , "View", ads::LeftDockWidgetArea);
+	AddGenericWindow("Position Monitoring", position_window , position_window_icon , "View", ads::LeftDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

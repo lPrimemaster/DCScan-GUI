@@ -21,7 +21,7 @@ FreejogWindow::FreejogWindow(QWidget* parent) : ui(new Ui::FreejogWindow)
 
 FreejogWindow::~FreejogWindow()
 {
-
+    
 }
 
 void FreejogWindow::updateAcc()
