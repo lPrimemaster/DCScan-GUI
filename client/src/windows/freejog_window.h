@@ -35,8 +35,11 @@ public slots:
 	void resetSlider1();
 	void resetSlider2();
 
-	void moveEngine1(int val);
-	void moveEngine2(int val);
+	void moveEngine1Free(int val);
+	void moveEngine2Free(int val);
+
+	void moveEngine1To();
+	void moveEngine2To();
 
 	void updateAcc();
 	void updateVel();

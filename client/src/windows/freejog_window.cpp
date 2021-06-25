@@ -9,8 +9,11 @@ FreejogWindow::FreejogWindow(QWidget* parent) : ui(new Ui::FreejogWindow)
     ui->warning_msg->setText("Free motion is disabled.\nConnect to server to enable.");
     enableFreejog(false);
 
-    (void)connect(ui->t1_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine1(int)));
-    (void)connect(ui->t2_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine2(int)));
+    (void)connect(ui->t1_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine1Free(int)));
+    (void)connect(ui->t2_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine2Free(int)));
+
+    (void)connect(ui->doubleSpinBox, SIGNAL(editingFinished()), this, SLOT(moveEngine1To()));
+    (void)connect(ui->doubleSpinBox_2, SIGNAL(editingFinished()), this, SLOT(moveEngine2To()));
 
     (void)connect(ui->t1_slider, SIGNAL(sliderReleased()), this, SLOT(resetSlider1()));
     (void)connect(ui->t2_slider, SIGNAL(sliderReleased()), this, SLOT(resetSlider2()));
@@ -68,7 +71,8 @@ void FreejogWindow::updateVel()
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 }
 
-void FreejogWindow::moveEngine1(int val)
+// TODO : Refactor this to avoid writting unecessary LOC's
+void FreejogWindow::moveEngine1Free(int val)
 {
     if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
     {
@@ -127,7 +131,7 @@ void FreejogWindow::moveEngine1(int val)
     }
 }
 
-void FreejogWindow::moveEngine2(int val)
+void FreejogWindow::moveEngine2Free(int val)
 {
     if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
     {
@@ -179,6 +183,58 @@ void FreejogWindow::moveEngine2(int val)
         
             DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
         }
+    }
+    else
+    {
+        LOG_ERROR("Cannot move engine 2: acceleration or velocity value is zero.");
+    }
+}
+
+void FreejogWindow::moveEngine1To()
+{
+    if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
+    {
+        QString cmd = "1VA" + QString::number(ui->doubleSpinBox_3->value()) + ";";
+        unsigned char buffer[4096];
+
+        cmd += "1PA" + QString::number(ui->doubleSpinBox->value()) + ";"; // Move to desired position
+
+        DCS::Utils::BasicString str;
+        memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_IssueGenericCommand,
+            DCS::Control::UnitTarget::ESP301,
+            str
+        );
+    
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+    }
+    else
+    {
+        LOG_ERROR("Cannot move engine 1: acceleration or velocity value is zero.");
+    }
+}
+
+void FreejogWindow::moveEngine2To()
+{
+    if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
+    {
+        QString cmd = "2VA" + QString::number(ui->doubleSpinBox_3->value()) + ";";
+        unsigned char buffer[4096];
+
+        cmd += "2PA" + QString::number(ui->doubleSpinBox->value()) + ";"; // Move to desired position
+
+        DCS::Utils::BasicString str;
+        memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_IssueGenericCommand,
+            DCS::Control::UnitTarget::ESP301,
+            str
+        );
+    
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
     }
     else
     {

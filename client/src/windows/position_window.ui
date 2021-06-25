@@ -199,6 +199,9 @@ modified when acquiring.</string>
        <property name="decimals">
         <number>4</number>
        </property>
+       <property name="minimum">
+        <double>-360.000000000000000</double>
+       </property>
        <property name="maximum">
         <double>360.000000000000000</double>
        </property>
@@ -244,6 +247,9 @@ modified when acquiring.</string>
        </property>
        <property name="decimals">
         <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>-360.000000000000000</double>
        </property>
        <property name="maximum">
         <double>360.000000000000000</double>

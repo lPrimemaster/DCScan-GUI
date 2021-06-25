@@ -47,7 +47,7 @@ void PositionWindow::update()
         size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_Control_IssueGenericCommandResponse,
                 DCS::Control::UnitTarget::ESP301,
-                DCS::Utils::BasicString{ "1VA?" }
+                DCS::Utils::BasicString{ "1TV?" }
             );
         
         auto vel1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
@@ -55,7 +55,7 @@ void PositionWindow::update()
         size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_Control_IssueGenericCommandResponse,
                 DCS::Control::UnitTarget::ESP301,
-                DCS::Utils::BasicString{ "2VA?" }
+                DCS::Utils::BasicString{ "2TV?" }
             );
         
         auto vel2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
