@@ -108,7 +108,16 @@ void PositionWindow::update()
 
 void PositionWindow::resetTimer()
 {
-    int timeout = (int)round((1 / ui->doubleSpinBox->value()) * 1000);
-    LOG_DEBUG("Reseting timer. dt = %d", timeout);
-    timer->setInterval(timeout);
+    float val = ui->doubleSpinBox->value();
+    if(val > 0.0f)
+    {
+        int timeout = (int)round((1 / val) * 1000);
+        LOG_DEBUG("Reseting timer. dt = %d", timeout);
+        timer->start();
+        timer->setInterval(timeout);
+    }
+    else
+    {
+        timer->stop();
+    }
 }

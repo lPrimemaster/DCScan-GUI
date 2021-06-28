@@ -41,6 +41,8 @@ public slots:
 	void moveEngine1To();
 	void moveEngine2To();
 
+	void moveTiltTo(int stage, int axis, QSpinBox* spin_obj);
+
 	void updateAcc();
 	void updateVel();
 
