@@ -18,6 +18,7 @@
 #include "connect_window.h"
 #include "freejog_window.h"
 #include "position_window.h"
+#include "channelviz_window.h"
 
 void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area)
 {
@@ -84,7 +85,7 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 
 	auto histSetts_window 	   = new HistSettingsWindow(this);
 	auto histSetts_window_icon = QIcon();
-	AddGenericWindow("Graph Details", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
+	AddGenericWindow("Spectral Details", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
 
 	auto test_window           = new TestWindow(this);
 	auto test_window_icon      = QIcon(":/png/debug_window.png");
@@ -101,6 +102,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto position_window         = new PositionWindow(this);
 	auto position_window_icon    = QIcon(":/png/position_window.png");
 	AddGenericWindow("Position Monitoring", position_window , position_window_icon , "View", ads::LeftDockWidgetArea);
+
+	auto channelviz_window         = new ChannelvizWindow(this);
+	auto channelviz_window_icon    = QIcon(":/png/channelviz_window.png");
+	AddGenericWindow("Channel Visualizer", channelviz_window , channelviz_window_icon , "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

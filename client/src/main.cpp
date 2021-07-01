@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 
 	// Register custom signal data
 	qRegisterMetaType<GraphSettings>("GraphSettings");
+	qRegisterMetaType<QVector<QPointF>>("QVector<QPointF>");
 
     MainWindow w(&a);
 

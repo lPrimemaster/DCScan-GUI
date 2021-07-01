@@ -51,6 +51,10 @@ set(SOURCE
 	src/windows/position_window.cpp
 	src/windows/position_window.ui
 
+	src/windows/channelviz_window.h
+	src/windows/channelviz_window.cpp
+	src/windows/channelviz_window.ui
+
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui
 
