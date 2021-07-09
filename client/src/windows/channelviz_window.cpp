@@ -78,7 +78,7 @@ void ChannelvizWindow::requestAIStart()
 
     auto size = DCS::Registry::SVParams::GetDataFromParams(buffer, SV_CALL_DCS_DAQ_NewAIVChannel, cname, str, ref, l);
 
-    DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
+    DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
     size = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_DAQ_VoltageEvent, [](DCS::u8* data, DCS::u8* userData) {
             DCS::f64* fdata = (DCS::f64*)data;
