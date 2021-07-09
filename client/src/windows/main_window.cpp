@@ -5,6 +5,8 @@
 #include <QProgressBar>
 #include <QMenuBar>
 #include <QSettings>
+#include <QBitmap>
+#include <QApplication>
 
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
@@ -19,6 +21,39 @@
 #include "freejog_window.h"
 #include "position_window.h"
 #include "channelviz_window.h"
+#include "layout_window.h"
+
+void MainWindow::AddSeparator(const QString& menu)
+{
+	auto pmenu = menuBar()->findChild<QMenu*>(menu);
+
+	auto it = menus.find(menu);
+
+	if(it == menus.end())
+	{
+		LOG_ERROR("Assigning separator to an unexsting menu. Ignoring...");
+	}
+	else
+	{
+		it.value()->addSeparator();
+	}
+}
+
+void MainWindow::AddGenericAction(QAction* action, const QIcon& icon, const QString& menu)
+{
+	auto pmenu = menuBar()->findChild<QMenu*>(menu);
+
+	auto it = menus.find(menu);
+
+	if(it == menus.end())
+	{
+		LOG_ERROR("Assigning action to an unexsting menu. Ignoring...");
+	}
+	else
+	{
+		it.value()->addAction(action);
+	}
+}
 
 void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area)
 {
@@ -33,7 +68,7 @@ void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const Q
 
 	if(it == menus.end())
 	{
-		LOG_ERROR("Assigning window to a unexsting menu. Ignoring...");
+		LOG_ERROR("Assigning window to an unexsting menu. Ignoring...");
 	}
 	else
 	{
@@ -43,11 +78,17 @@ void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const Q
 	dock_manager->addDockWidgetTab(area, dock);
 
 	windows.insert(title, window);
+	docks.insert(title, dock);
 }
 
 void MainWindow::AddMenu(const QString& name)
 {
 	menus.insert(name, menuBar()->addMenu(name));
+}
+
+void MainWindow::SetSubWIcon(const QString& title, QIcon icon)
+{
+	docks.value(title)->setIcon(icon);
 }
 
 MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
@@ -58,7 +99,9 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	// Setup dock manager
     dock_manager = new ads::CDockManager(this);
     ads::CDockManager::setConfigFlag(ads::CDockManager::FloatingContainerHasWidgetIcon, true);
+    ads::CDockManager::setConfigFlag(ads::CDockManager::AlwaysShowTabs, false);
 	ads::CDockManager::setConfigFlag(ads::CDockManager::DockAreaDynamicTabsMenuButtonVisibility, true);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::FloatingContainerHasWidgetTitle, true);
 
 	// Disable style sheet, use own
 	dock_manager->setStyleSheet("");
@@ -72,6 +115,7 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	// Add menus to top bar
 	AddMenu("View");
 	AddMenu("Options");
+	AddMenu("Layout");
 
 	// Construct all windows
 	// And add them to the default view
@@ -112,6 +156,20 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	// Load user perspectives and set the default one active
 	QSettings s("ads_perspectives.ini", QSettings::Format::IniFormat);
 	dock_manager->loadPerspectives(s);
+
+	for(auto p : dock_manager->perspectiveNames())
+	{
+		QAction* a = new QAction(p, this);
+		(void)connect(a, &QAction::triggered, this, [=](){ dock_manager->openPerspective(p); });
+		AddGenericAction(a, QIcon(), "Layout");
+	}
+
+	AddSeparator("Layout");
+
+	auto layout_window         = new LayoutWindow(this);
+	auto layout_window_icon    = QIcon(":/png/layout_window.png");
+	AddGenericWindow("Layout Manager", layout_window , layout_window_icon , "Layout", ads::NoDockWidgetArea);
+
 	dock_manager->openPerspective("Default");
 
 	IssueStatusBarText("Ready.");

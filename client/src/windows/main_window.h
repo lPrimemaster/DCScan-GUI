@@ -78,9 +78,14 @@ public:
         status_bar->adjustSize();
     }
 
+    void SetSubWIcon(const QString& title, QIcon icon);
+
 private:
+    void AddSeparator(const QString& menu);
+    void AddGenericAction(QAction* action, const QIcon& icon, const QString& menu);
     void AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area);
     void AddMenu(const QString& name);
+
 
 private:
     ads::CDockManager* dock_manager;
@@ -88,6 +93,7 @@ private:
     QMap<QString, QMenu*> menus;
 
     QMap<QString, QWidget*> windows;
+    QMap<QString, ads::CDockWidget*> docks;
 
     QMap<QString, QWidget*> status_widgets;
 

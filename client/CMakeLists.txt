@@ -55,6 +55,10 @@ set(SOURCE
 	src/windows/channelviz_window.cpp
 	src/windows/channelviz_window.ui
 
+	src/windows/layout_window.h
+	src/windows/layout_window.cpp
+	src/windows/layout_window.ui
+
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui
 

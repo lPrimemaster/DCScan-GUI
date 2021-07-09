@@ -104,15 +104,6 @@ static void ConnectNet(QString username, QString password, QString ip, QString p
 		auto max_threads_srv = *(DCS::u16*)max_threads_srv_b.ptr;
 
 		qDebug() << "Got server max thread concurrency: " << max_threads_srv;
-
-		DCS::DAQ::ChannelLimits l;
-		l.min = -10.0;
-		l.max =  10.0;
-		auto size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString, DCS::Utils::BasicString, DCS::DAQ::ChannelRef, DCS::DAQ::ChannelLimits>(buffer, SV_CALL_DCS_DAQ_NewAIVChannel, 
-            { "Channel0Name" }, { "PXI_Slot2/ai0" }, DCS::DAQ::ChannelRef::Default, l);
-
-		DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
-
 		qDebug() << "Connection established!";
 		emit window->connectionChanged(true);
 	}
