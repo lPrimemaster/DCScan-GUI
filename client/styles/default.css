@@ -192,3 +192,24 @@ QSlider::handle:horizontal {
 QSlider::handle:horizontal:disabled {
     background-color: gray;
 }
+
+QToolBox::tab {
+    background: #ffd7a6;
+    border-radius: 3px;
+    color: black;
+    font: bold;
+}
+
+QToolBox::tab:selected {
+    background: palette(highlight);
+    border-radius: 3px;
+    color: black;
+    font: bold;
+}
+
+QToolBox::tab:hover {
+    background: gray;
+    border-radius: 3px;
+    color: white;
+    font: bold;
+}

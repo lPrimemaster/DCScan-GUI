@@ -22,6 +22,7 @@
 #include "position_window.h"
 #include "channelviz_window.h"
 #include "layout_window.h"
+#include "spectraldisplay_window.h"
 
 void MainWindow::AddSeparator(const QString& menu)
 {
@@ -150,6 +151,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto channelviz_window         = new ChannelvizWindow(this);
 	auto channelviz_window_icon    = QIcon(":/png/channelviz_window.png");
 	AddGenericWindow("Channel Visualizer", channelviz_window , channelviz_window_icon , "View", ads::NoDockWidgetArea);
+
+	auto spectraldisplay_window         = new SpectralDisplayWindow(this);
+	auto spectraldisplay_window_icon    = QIcon();
+	AddGenericWindow("Spectral Details (New)", spectraldisplay_window , spectraldisplay_window_icon , "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

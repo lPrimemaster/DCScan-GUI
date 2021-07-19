@@ -55,6 +55,14 @@ set(SOURCE
 	src/windows/channelviz_window.cpp
 	src/windows/channelviz_window.ui
 
+	src/windows/spectraldisplay_window.h
+	src/windows/spectraldisplay_window.cpp
+	src/windows/spectraldisplay_window.ui
+
+	src/windows/mcaspectrum_window.h
+	src/windows/mcaspectrum_window.cpp
+	src/windows/mcaspectrum_window.ui
+
 	src/windows/layout_window.h
 	src/windows/layout_window.cpp
 	src/windows/layout_window.ui

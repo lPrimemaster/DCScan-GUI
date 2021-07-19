@@ -22,8 +22,6 @@ public:
 	LayoutWindow(QWidget* parent = nullptr);
 	~LayoutWindow();
 
-    bool event(QEvent* e) Q_DECL_OVERRIDE;
-
 private:
 	Ui::LayoutWindow* ui;
     MainWindow* main_window;
