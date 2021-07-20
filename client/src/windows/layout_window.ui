@@ -44,7 +44,10 @@
      <item>
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>MyLayout</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>MyLayoutName</string>
        </property>
       </widget>
      </item>

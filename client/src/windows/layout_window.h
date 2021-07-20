@@ -3,6 +3,7 @@
 #include "../autogen_macros.h"
 
 #include <QWidget>
+#include <QString>
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
@@ -13,7 +14,7 @@
 
 UI_AUTOGEN(LayoutWindow)
 
-// TODO : Allow this to know the current acquisition state and disable channel visualization
+// TODO : Implement an overwrite button for non-default layouts
 class LayoutWindow : public QWidget
 {
 	Q_OBJECT
@@ -25,4 +26,5 @@ public:
 private:
 	Ui::LayoutWindow* ui;
     MainWindow* main_window;
+	std::vector<QString> perspectives;
 };

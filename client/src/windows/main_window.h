@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QStatusBar>
 #include <QLabel>
+#include <QAction>
 
 #include <qtadvanceddocking/DockManager.h>
 
@@ -78,11 +79,37 @@ public:
         status_bar->adjustSize();
     }
 
+    inline void UpdatePerspectives(QString name = "")
+    {
+        if(name == "")
+        {
+            for(auto p : dock_manager->perspectiveNames())
+            {
+                QAction* a = new QAction(p, this);
+                (void)connect(a, &QAction::triggered, this, [=](){ dock_manager->openPerspective(p); });
+                AddGenericAction(a, QIcon(), "Layout");
+            }
+        }
+        else
+        {
+            QAction* a = new QAction(name, this);
+            (void)connect(a, &QAction::triggered, this, [=](){ dock_manager->openPerspective(name); });
+            InsertLayout(a, QIcon(), "Layout");
+        }
+    }
+
+    inline void RemovePerspective(QString name)
+    {
+        RemoveLayout(name, "Layout");
+    }
+
     void SetSubWIcon(const QString& title, QIcon icon);
 
 private:
     void AddSeparator(const QString& menu);
     void AddGenericAction(QAction* action, const QIcon& icon, const QString& menu);
+    void InsertLayout(QAction* action, const QIcon& icon, const QString& menu);
+    void RemoveLayout(const QString& action, const QString& menu);
     void AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area);
     void AddMenu(const QString& name);
 
@@ -98,4 +125,5 @@ private:
     QMap<QString, QWidget*> status_widgets;
 
     QApplication* app;
+    QString lastLayout;
 };

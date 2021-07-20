@@ -56,6 +56,54 @@ void MainWindow::AddGenericAction(QAction* action, const QIcon& icon, const QStr
 	}
 }
 
+void MainWindow::InsertLayout(QAction* action, const QIcon& icon, const QString& menu)
+{
+	auto pmenu = menuBar()->findChild<QMenu*>(menu);
+
+	auto it = menus.find(menu);
+
+	if(it == menus.end())
+	{
+		LOG_ERROR("Assigning action to an unexsting menu. Ignoring...");
+	}
+	else
+	{
+		auto as = it.value()->actions();
+		auto ait = std::find_if(as.begin(), as.end(), [&](const QAction* val) -> bool {
+			return val->text() == lastLayout;
+		});
+
+		if(ait != as.end())
+		{
+			it.value()->insertAction(*ait, action);
+		}
+	}
+}
+
+void MainWindow::RemoveLayout(const QString& action, const QString& menu)
+{
+	auto pmenu = menuBar()->findChild<QMenu*>(menu);
+
+	auto it = menus.find(menu);
+
+	if(it == menus.end())
+	{
+		LOG_ERROR("Removing action from an unexsting menu. Ignoring...");
+	}
+	else
+	{
+		auto as = it.value()->actions();
+		auto ait = std::find_if(as.begin(), as.end(), [&](const QAction* val) -> bool {
+			return val->text() == action;
+		});
+
+		if(ait != as.end())
+		{
+			it.value()->removeAction(*ait);
+		}
+	}
+}
+
 void MainWindow::AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area)
 {
 	ads::CDockWidget* dock = new ads::CDockWidget(title);
@@ -162,12 +210,7 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	QSettings s("ads_perspectives.ini", QSettings::Format::IniFormat);
 	dock_manager->loadPerspectives(s);
 
-	for(auto p : dock_manager->perspectiveNames())
-	{
-		QAction* a = new QAction(p, this);
-		(void)connect(a, &QAction::triggered, this, [=](){ dock_manager->openPerspective(p); });
-		AddGenericAction(a, QIcon(), "Layout");
-	}
+	UpdatePerspectives();
 
 	AddSeparator("Layout");
 
