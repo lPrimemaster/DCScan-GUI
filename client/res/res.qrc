@@ -24,6 +24,7 @@
     <file alias="position_window.png">png/position_window.png</file>
     <file alias="channelviz_window.png">png/channelviz_window.png</file>
     <file alias="layout_window.png">png/layout_window.png</file>
+    <file alias="mcaspectrum_window.png">png/mcaspectrum_window.png</file>
   </qresource>
 
   <qresource prefix="/sound">

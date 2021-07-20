@@ -23,6 +23,7 @@
 #include "channelviz_window.h"
 #include "layout_window.h"
 #include "spectraldisplay_window.h"
+#include "mcaspectrum_window.h"
 
 void MainWindow::AddSeparator(const QString& menu)
 {
@@ -203,6 +204,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto spectraldisplay_window         = new SpectralDisplayWindow(this);
 	auto spectraldisplay_window_icon    = QIcon();
 	AddGenericWindow("Spectral Details (New)", spectraldisplay_window , spectraldisplay_window_icon , "View", ads::NoDockWidgetArea);
+	
+	auto mcaspectrum_window         = new MCASpectrumWindow(this);
+	auto mcaspectrum_window_icon    = QIcon(":/png/mcaspectrum_window.png");
+	AddGenericWindow("MCA Spectrum", mcaspectrum_window , mcaspectrum_window_icon , "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 
