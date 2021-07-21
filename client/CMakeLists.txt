@@ -32,9 +32,6 @@ set(SOURCE
 	src/windows/hist_window.h
 	src/windows/hist_window.cpp
 
-	src/windows/histsett_window.h
-	src/windows/histsett_window.cpp
-
 	src/windows/test_window.h
 	src/windows/test_window.cpp
 	src/windows/test_window.ui
@@ -61,11 +58,14 @@ set(SOURCE
 
 	src/windows/mcaspectrum_window.h
 	src/windows/mcaspectrum_window.cpp
-	src/windows/mcaspectrum_window.ui
 
 	src/windows/layout_window.h
 	src/windows/layout_window.cpp
 	src/windows/layout_window.ui
+
+	src/windows/acquisitioncontrol_window.h
+	src/windows/acquisitioncontrol_window.cpp
+	src/windows/acquisitioncontrol_window.ui
 
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui

@@ -16,8 +16,6 @@
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
 
-#include "histsett_window.h"
-
 
 class HistWindow : public QtCharts::QChartView
 {
@@ -50,7 +48,7 @@ private:
 	
 public slots:
 	void setAxisBinRange(int nbins);
-	void updateAllSettings(GraphSettings settings);
+	//void updateAllSettings(GraphSettings settings);
 	void updateBin(int idx);
 	void adjustGraphAxisRange(bool auto_adj);
 

@@ -15,7 +15,6 @@
 
 #include "log_window.h"
 #include "hist_window.h"
-#include "histsett_window.h"
 #include "test_window.h"
 #include "connect_window.h"
 #include "freejog_window.h"
@@ -24,6 +23,7 @@
 #include "layout_window.h"
 #include "spectraldisplay_window.h"
 #include "mcaspectrum_window.h"
+#include "acquisitioncontrol_window.h"
 
 void MainWindow::AddSeparator(const QString& menu)
 {
@@ -177,10 +177,6 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto hist_window_icon  	   = QIcon(":/png/spectrum_window.png");
 	AddGenericWindow("Spectrum Graph", hist_window     , hist_window_icon     , "View", ads::TopDockWidgetArea);
 
-	auto histSetts_window 	   = new HistSettingsWindow(this);
-	auto histSetts_window_icon = QIcon();
-	AddGenericWindow("Spectral Details", histSetts_window, histSetts_window_icon, "View", ads::RightDockWidgetArea);
-
 	auto test_window           = new TestWindow(this);
 	auto test_window_icon      = QIcon(":/png/debug_window.png");
 	AddGenericWindow("Debug Window"  , test_window     , test_window_icon     , "View", ads::LeftDockWidgetArea);
@@ -202,12 +198,16 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	AddGenericWindow("Channel Visualizer", channelviz_window , channelviz_window_icon , "View", ads::NoDockWidgetArea);
 
 	auto spectraldisplay_window         = new SpectralDisplayWindow(this);
-	auto spectraldisplay_window_icon    = QIcon();
-	AddGenericWindow("Spectral Details (New)", spectraldisplay_window , spectraldisplay_window_icon , "View", ads::NoDockWidgetArea);
+	auto spectraldisplay_window_icon    = QIcon(":/png/spectraldisplay_window.png");
+	AddGenericWindow("Acquisition Details", spectraldisplay_window , spectraldisplay_window_icon , "View", ads::NoDockWidgetArea);
 	
 	auto mcaspectrum_window         = new MCASpectrumWindow(this);
 	auto mcaspectrum_window_icon    = QIcon(":/png/mcaspectrum_window.png");
 	AddGenericWindow("MCA Spectrum", mcaspectrum_window , mcaspectrum_window_icon , "View", ads::NoDockWidgetArea);
+
+	auto acquisitioncontrol_window         = new AcquisitionControlWindow(this);
+	auto acquisitioncontrol_window_icon    = QIcon(":/png/acquisitioncontrol_window.png");
+	AddGenericWindow("Acquisition Control", acquisitioncontrol_window , acquisitioncontrol_window_icon , "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

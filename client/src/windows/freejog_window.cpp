@@ -9,7 +9,7 @@ FreejogWindow::FreejogWindow(QWidget* parent) : ui(new Ui::FreejogWindow)
     ui->warning_msg->setText("Free motion is disabled.\nConnect to server to enable.");
     enableFreejog(false);
 
-    // TODO : Connect can use lambdas in Qt5. This would allow to use less specific slots for all engines
+    // NOTE : Connect can use lambdas in Qt5. This would allow to use less specific slots for all engines
     (void)connect(ui->t1_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine1Free(int)));
     (void)connect(ui->t2_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine2Free(int)));
 

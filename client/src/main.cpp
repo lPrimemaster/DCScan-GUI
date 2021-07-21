@@ -1,5 +1,4 @@
 #include "windows/main_window.h"
-#include "windows/histsett_window.h"
 
 #include <fstream>
 #include <iterator>
@@ -18,7 +17,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 	// Register custom signal data
-	qRegisterMetaType<GraphSettings>("GraphSettings");
+	//qRegisterMetaType<GraphSettings>("GraphSettings");
 	qRegisterMetaType<QVector<QPointF>>("QVector<QPointF>");
 
     MainWindow w(&a);

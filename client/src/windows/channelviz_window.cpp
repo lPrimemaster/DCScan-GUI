@@ -85,7 +85,7 @@ void ChannelvizWindow::requestAIStart()
 
             ChannelvizWindow* window = (ChannelvizWindow*)userData;
 
-            // TODO : Dont allocate QVector buffer every time!!!
+            // NOTE : Allocate QVector buffer every time??
             QVector<QPointF> points;
             points.reserve(1000);
             for(int i = 0 ; i < 1000; i++)

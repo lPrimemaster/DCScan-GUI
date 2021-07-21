@@ -20,7 +20,7 @@ HistWindow::HistWindow(QWidget* parent) : QChartView(parent)
 
 	// TODO : Add this to ctor later
 	max_n_bins = 1000;
-	max_bin_h = 100;
+	max_bin_h = 1000;
 
 	for(int i = 0; i < 1000; i++)
 		set0->append(i);
@@ -193,16 +193,16 @@ void HistWindow::resetZoom()
 	chart->zoomReset();
 }
 
-void HistWindow::updateAllSettings(GraphSettings settings)
-{
-	// Change Bins / Axis
-	if(settings.maximum_bins != max_n_bins)
-		setAxisBinRange(settings.maximum_bins);
+// void HistWindow::updateAllSettings(GraphSettings settings)
+// {
+// 	// Change Bins / Axis
+// 	if(settings.maximum_bins != max_n_bins)
+// 		setAxisBinRange(settings.maximum_bins);
 
-	// Change bars color - Assume only one set at all times
-	bar_series->barSets()[0]->setColor(settings.bins_color);
-	gcolor = settings.bins_color;
-}
+// 	// Change bars color - Assume only one set at all times
+// 	bar_series->barSets()[0]->setColor(settings.bins_color);
+// 	gcolor = settings.bins_color;
+// }
 
 void HistWindow::updateBin(int idx)
 {

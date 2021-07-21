@@ -11,7 +11,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
-#include <QCheckBox>
+#include <QTimer>
 #include <QLineSeries>
 #include <QValueAxis>
 
@@ -21,22 +21,22 @@
 #include <DCS_Network/include/DCS_ModuleNetwork.h>
 
 #include "main_window.h"
+#include "connect_window.h"
 #include "spectraldisplay_window.h"
+// #include "position_window.h"
 
-UI_AUTOGEN(SpectralDisplayWindow)
+UI_AUTOGEN(AcquisitionControlWindow)
 
 // TODO : Allow this to know the current acquisition state and disable channel visualization
-class SpectralDisplayWindow : public QWidget
+class AcquisitionControlWindow : public QWidget
 {
 	Q_OBJECT
 
 public:
-	SpectralDisplayWindow(QWidget* parent = nullptr);
-	~SpectralDisplayWindow();
-
-signals:
-	void acquisitionEnableScheduleChanged(const QString& task, int channel, bool status);
+	AcquisitionControlWindow(QWidget* parent = nullptr);
+	~AcquisitionControlWindow();
 
 private:
-	Ui::SpectralDisplayWindow* ui;
+	Ui::AcquisitionControlWindow* ui;
+	QMap<QString, int> channels;
 };
