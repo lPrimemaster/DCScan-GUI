@@ -4,7 +4,7 @@
 
 #include <QTabWidget>
 #include <QWidget>
-#include <QFormLayout>
+#include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QSpinBox>
@@ -39,4 +39,7 @@ public:
 private:
 	Ui::AcquisitionControlWindow* ui;
 	QMap<QString, int> channels;
+
+	bool local_net_status = false;
+	bool working = false;
 };
