@@ -48,6 +48,12 @@ SpectralDisplayWindow::SpectralDisplayWindow(QWidget* parent) : ui(new Ui::Spect
     });
 }
 
+void SpectralDisplayWindow::disableWhenWorking(bool working)
+{
+    ui->checkBox_3->setEnabled(!working);
+    ui->checkBox_4->setEnabled(!working);
+}
+
 SpectralDisplayWindow::~SpectralDisplayWindow()
 {
 

@@ -107,6 +107,8 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
         ui->pushButton_3->setEnabled(true);
 
         working = true;
+        emit workingChanged(true);
+
         ui->pushButton->setEnabled(false);
         ui->lineEdit->setText("Working.");
         ui->lineEdit->setStyleSheet("color: green;");
@@ -131,6 +133,8 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
         ui->pushButton_3->setEnabled(false);
 
         working = false;
+        emit workingChanged(false);
+
         ui->pushButton->setEnabled(true);
         ui->lineEdit->setText("Ready.");
         ui->lineEdit->setStyleSheet("color: aqua;");
@@ -147,6 +151,8 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
 
         // TODO : Flag acquisition stop to the backend.
     });
+
+    (void)connect(this, &AcquisitionControlWindow::workingChanged, sdw, &SpectralDisplayWindow::disableWhenWorking);
 }
 
 AcquisitionControlWindow::~AcquisitionControlWindow()

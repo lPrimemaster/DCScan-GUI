@@ -36,6 +36,9 @@ public:
 	AcquisitionControlWindow(QWidget* parent = nullptr);
 	~AcquisitionControlWindow();
 
+signals:
+	void workingChanged(bool working);
+
 private:
 	Ui::AcquisitionControlWindow* ui;
 	QMap<QString, int> channels;

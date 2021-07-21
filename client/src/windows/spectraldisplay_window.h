@@ -34,6 +34,9 @@ public:
 	SpectralDisplayWindow(QWidget* parent = nullptr);
 	~SpectralDisplayWindow();
 
+public slots:
+	void disableWhenWorking(bool working);
+
 signals:
 	void acquisitionEnableScheduleChanged(const QString& task, int channel, bool status);
 
