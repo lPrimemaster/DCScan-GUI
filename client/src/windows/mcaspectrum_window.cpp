@@ -11,7 +11,7 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
 	max_n_bins = 1024;
 	max_bin_h = 100;
 
-    for(int i = 0; i < max_n_bins; i++)
+    for(int i = 0; i < (int)max_n_bins; i++)
 		set->append(i / 30.0);
 
     bar_series->append(set);
@@ -158,7 +158,7 @@ void MCASpectrumWindow::mouseDoubleClickEvent(QMouseEvent* event)
 		if(selected_bar_rect != nullptr)
 		{
 			selected_bin = std::round(getSeriesCoordFromChartCoord(lastMousePos, bar_series).x());
-			selected_bin = selected_bin > max_n_bins ? max_n_bins : selected_bin < 0 ? 0 : selected_bin;
+			selected_bin = selected_bin > (int)max_n_bins ? max_n_bins : selected_bin < 0 ? 0 : selected_bin;
 			int current_val = static_cast<int>(bar_series->barSets()[0]->at(selected_bin));
 
 			QBrush b = selected_bar_rect->brush();

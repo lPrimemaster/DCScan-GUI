@@ -45,7 +45,7 @@ LayoutWindow::LayoutWindow(QWidget* parent) : ui(new Ui::LayoutWindow)
 
             QPixmap pixmap(15, 15);
             pixmap.fill(QColor("black"));
-            ui->listWidget->item(perspectives.size() - 1)->setIcon(QIcon(pixmap));
+            ui->listWidget->item((int)perspectives.size() - 1)->setIcon(QIcon(pixmap));
 
             QFile("ads_perspectives.ini").remove(); // Enforce a clean file
             main_window->GetDockManager()->savePerspectives(QSettings("ads_perspectives.ini", QSettings::Format::IniFormat));
