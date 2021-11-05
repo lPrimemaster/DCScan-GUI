@@ -163,8 +163,10 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
                 size = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_DAQ_MCACountEvent, [](DCS::u8* data, DCS::u8* userData) {
                     
                     LOG_DEBUG("GOT MCA Event");
+                    DCS::DAQ::MCACountEventData* cdata = (DCS::DAQ::MCACountEventData*)data;
 
-                }, nullptr);
+                    emit ((AcquisitionControlWindow*)userData)->eventMCA(*cdata);
+                }, (DCS::u8*)this);
                 DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::EVT_SUB, buffer, size);
             }
         }

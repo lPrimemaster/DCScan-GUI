@@ -200,14 +200,14 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto spectraldisplay_window         = new SpectralDisplayWindow(this);
 	auto spectraldisplay_window_icon    = QIcon(":/png/spectraldisplay_window.png");
 	AddGenericWindow("Acquisition Details", spectraldisplay_window , spectraldisplay_window_icon , "View", ads::NoDockWidgetArea);
-	
-	auto mcaspectrum_window         = new MCASpectrumWindow(this);
-	auto mcaspectrum_window_icon    = QIcon(":/png/mcaspectrum_window.png");
-	AddGenericWindow("MCA Spectrum", mcaspectrum_window , mcaspectrum_window_icon , "View", ads::NoDockWidgetArea);
 
 	auto acquisitioncontrol_window         = new AcquisitionControlWindow(this);
 	auto acquisitioncontrol_window_icon    = QIcon(":/png/acquisitioncontrol_window.png");
 	AddGenericWindow("Acquisition Control", acquisitioncontrol_window , acquisitioncontrol_window_icon , "View", ads::NoDockWidgetArea);
+
+	auto mcaspectrum_window         = new MCASpectrumWindow(this);
+	auto mcaspectrum_window_icon    = QIcon(":/png/mcaspectrum_window.png");
+	AddGenericWindow("MCA Spectrum", mcaspectrum_window , mcaspectrum_window_icon , "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

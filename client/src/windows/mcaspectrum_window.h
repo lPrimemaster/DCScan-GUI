@@ -22,6 +22,7 @@
 
 #include "main_window.h"
 #include "connect_window.h"
+#include "acquisitioncontrol_window.h"
 
 // TODO : Make a base class for this and the DCS spectra, its simply easier...
 class MCASpectrumWindow : public QtCharts::QChartView
@@ -51,6 +52,7 @@ private:
 	QtCharts::QBarSeries* bar_series;
 	QtCharts::QBarSet* set;
 	ConnectWindow* connect_window;
+	AcquisitionControlWindow* acq_window;
 
 	QtCharts::QValueAxis* axis_x;
 	QtCharts::QValueAxis* axis_y;

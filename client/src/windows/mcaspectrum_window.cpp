@@ -55,12 +55,21 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
             bar_series->setBarWidth(1);
 
             for(int i = 0; i < mca_channels; i++)
-                set->append(i / 100.0);
+                set->append(0.0);
         }
         else
         {
             // Connection off
         }
+    }, Qt::QueuedConnection);
+
+	acq_window = dynamic_cast<MainWindow*>(parent)->GetWindow<AcquisitionControlWindow>("Acquisition Control");
+    (void)connect(acq_window, &AcquisitionControlWindow::eventMCA, this, [&](DCS::DAQ::MCACountEventData data) {
+		LOG_DEBUG("Replacing data");
+		for(int i = 0; i < data.count; i++)
+		{
+			set->replace(data.bins[i], set->at(data.bins[i]) + 1);
+		}
     }, Qt::QueuedConnection);
 }
 

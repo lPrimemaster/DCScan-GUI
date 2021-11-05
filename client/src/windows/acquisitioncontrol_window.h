@@ -38,6 +38,7 @@ public:
 
 signals:
 	void workingChanged(bool working);
+	void eventMCA(DCS::DAQ::MCACountEventData data);
 
 private:
 	Ui::AcquisitionControlWindow* ui;
