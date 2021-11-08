@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
 	// Register custom signal data
 	//qRegisterMetaType<GraphSettings>("GraphSettings");
 	qRegisterMetaType<QVector<QPointF>>("QVector<QPointF>");
+	qRegisterMetaType<DCS::DAQ::MCACountEventData>("DCS::DAQ::MCACountEventData");
+	qRegisterMetaType<DCS::DAQ::DCSCountEventData>("DCS::DAQ::DCSCountEventData");
 
     MainWindow w(&a);
 

@@ -26,6 +26,8 @@ public:
 
 		default_c = ui->text_log->textColor();
 
+		ui->text_log->document()->setMaximumBlockCount(max_log_blocks);
+
 		DCS::Utils::Logger::SetLogWriteCallback(log_callback, this);
 		(void)connect(this, &LogWindow::receiveLogSig, this, &LogWindow::publishLog);
 
@@ -82,4 +84,5 @@ private:
 	Ui::LogWindow* ui;
 	QColor default_c;
 	QSound critical_notify;
+	const unsigned max_log_blocks = 200;
 };

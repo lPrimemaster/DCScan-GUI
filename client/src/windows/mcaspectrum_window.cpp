@@ -8,11 +8,11 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
     set = new QBarSet("Data");
 
     // TODO : Add this to ctor later
-	max_n_bins = 1024;
+	max_n_bins = 8096;
 	max_bin_h = 100;
 
     for(int i = 0; i < (int)max_n_bins; i++)
-		set->append(i / 30.0);
+		set->append(0.0);
 
     bar_series->append(set);
     bar_series->setBarWidth(bar_series->count());
@@ -55,7 +55,7 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
             bar_series->setBarWidth(1);
 
             for(int i = 0; i < mca_channels; i++)
-                set->append(0.0);
+                set->replace(i, 0.0);
         }
         else
         {
@@ -65,7 +65,6 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
 
 	acq_window = dynamic_cast<MainWindow*>(parent)->GetWindow<AcquisitionControlWindow>("Acquisition Control");
     (void)connect(acq_window, &AcquisitionControlWindow::eventMCA, this, [&](DCS::DAQ::MCACountEventData data) {
-		LOG_DEBUG("Replacing data");
 		for(int i = 0; i < data.count; i++)
 		{
 			set->replace(data.bins[i], set->at(data.bins[i]) + 1);
@@ -75,7 +74,7 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
 
 MCASpectrumWindow::~MCASpectrumWindow()
 {
-
+	
 }
 
 void MCASpectrumWindow::mouseMoveEvent(QMouseEvent* event)

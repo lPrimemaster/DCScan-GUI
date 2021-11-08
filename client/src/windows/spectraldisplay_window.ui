@@ -26,7 +26,7 @@
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -606,14 +606,14 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_29">
            <property name="text">
-            <string>Attached Channel (TODO)</string>
+            <string>Attached Channel</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
           <widget class="QCheckBox" name="checkBox_3">
            <property name="text">
-            <string>Enable Acquisition</string>
+            <string>Schedule Acquisition</string>
            </property>
           </widget>
          </item>
@@ -1034,7 +1034,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_31">
            <property name="text">
-            <string>Attached Channel (TODO)</string>
+            <string>Attached Channel</string>
            </property>
           </widget>
          </item>
@@ -1088,7 +1088,7 @@
          <item row="1" column="0">
           <widget class="QCheckBox" name="checkBox_4">
            <property name="text">
-            <string>Enable Acquisition</string>
+            <string>Schedule Acquisition</string>
            </property>
           </widget>
          </item>
