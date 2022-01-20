@@ -25,6 +25,7 @@ void PositionWindow::update()
     // TODO : Make this non-blocking instead with SendAsync and a QThread
     if(connect_window->isNetworkConnected())
     {
+#if 0
         // Ask for engines position
         unsigned char buffer[1024];
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
@@ -103,6 +104,31 @@ void PositionWindow::update()
         ui->spinBox_8->setValue(atoi((*(DCS::Utils::BasicString*)stepY1.ptr).buffer));
         ui->spinBox_7->setValue(atoi((*(DCS::Utils::BasicString*)stepX2.ptr).buffer));
         ui->spinBox_9->setValue(atoi((*(DCS::Utils::BasicString*)stepY2.ptr).buffer));
+#elif 0
+        // Ask for engines position
+        unsigned char buffer[1024];
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommandResponse,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "GroupPositionCurrentGet(Group1.Pos, double*)" }
+            );
+        
+        auto pos1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        QString val1 = (*(DCS::Utils::BasicString*)pos1.ptr).buffer;
+        ui->doubleSpinBox_2->setValue(val1.split(',').at(1).toDouble());
+#else
+        // Ask for encoder position
+        unsigned char buffer[1024];
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_ENC_InspectLastEncoderValues
+            );
+        
+        auto enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        DCS::ENC::EncoderData data = (*(DCS::ENC::EncoderData*)enc.ptr);
+        ui->doubleSpinBox_2->setDecimals(8);
+        ui->doubleSpinBox_2->setValue(data.axis[0].calpos);
+        // ui->doubleSpinBox_3->setValue(data.axis[1].calpos);
+#endif
     }
 }
 

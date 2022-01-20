@@ -2,6 +2,7 @@
 #include <DCS_Network/include/DCS_ModuleNetwork.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Core/include/DCS_ModuleCore.h>
+#include <DCS_Acquisition/include/DCS_ModuleAcquisition.h>
 
 #include <atomic>
 
@@ -19,17 +20,9 @@ int main(int argc, char* argv[])
 	// Initialize acquisition services
 	DCS::DAQ::Init();
 
-	std::atomic<bool> stop = false;
-
-	// std::thread t([&] { 
-	// 		std::this_thread::sleep_for(std::chrono::milliseconds(5000)); 
-
-	// 		while (!stop.load())
-	// 		{ 
-	// 			DCS::Network::Message::FibSeqEvt();
-	// 			std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-	// 		}
-	// });
+	// Initializes encoder services
+	DCS::f64 per_rev[] = {0.0, 0.0, 0.0, 36000.0};
+	DCS::ENC::Init("10.80.0.99", 0b0001, per_rev);
 
 	auto listen = DCS::Network::Server::Create(15777);
 
@@ -39,6 +32,8 @@ int main(int argc, char* argv[])
 
 	DCS::Network::Server::StopListening(listen);
 
+	DCS::ENC::Terminate();
+
 	DCS::DAQ::Terminate();
 
 	DCS::Control::StopServices();
@@ -46,8 +41,6 @@ int main(int argc, char* argv[])
 	DCS::Network::Destroy();
 
 	DCS::Utils::Logger::Destroy();
-
-	stop.store(true);
 
 	return 0;
 }

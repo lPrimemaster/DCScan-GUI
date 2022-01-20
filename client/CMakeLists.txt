@@ -14,11 +14,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXE_LINKER_FLAGS "/IGNORE:4217 /NODEFAULTLIB:libcmt.lib")
 
 # For Qt
-#set(CMAKE_PREFIX_PATH "H:/Qt/5.15.1/msvc2019_64")
-set(CMAKE_PREFIX_PATH "D:/Qt/5.15.1/msvc2019_64")
+list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64")
+
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Charts Multimedia REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Charts Multimedia REQUIRED)
+
+get_property(loc TARGET Qt5::Core PROPERTY IMPORTED_LOCATION_RELEASE)
+message(STATUS "${loc}")
 
 qt5_add_resources(RESFILES res/res.qrc)
 
@@ -94,7 +97,7 @@ else()
 endif()
 
 if(DEBUG_BUILD)
-    message("Configuring client for debug mode.")
+    message(WARNING "Configuring client for debug mode.")
 
 	# Fix linker warnings's (LNK4217) in the 3rd party library
 	target_link_libraries(DCScan-Client PRIVATE

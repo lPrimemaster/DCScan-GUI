@@ -35,6 +35,7 @@ FreejogWindow::~FreejogWindow()
 
 void FreejogWindow::updateAcc()
 {
+#if 0
     double acc = ui->doubleSpinBox_4->value();
     QString values = 
          "1AU" + QString::number(acc) + 
@@ -54,10 +55,12 @@ void FreejogWindow::updateAcc()
     );
 
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
 }
 
 void FreejogWindow::updateVel()
 {
+#if 0
     double vel = ui->doubleSpinBox_3->value();
     QString values = 
          "1VU" + QString::number(vel) + 
@@ -75,6 +78,7 @@ void FreejogWindow::updateVel()
     );
 
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
 }
 
 // TODO : Refactor this to avoid writting unecessary LOC's
@@ -84,6 +88,8 @@ void FreejogWindow::moveEngine1Free(int val)
     {
         QString cmd = "1VA" + QString::number((ui->doubleSpinBox_3->value() / 5.0) * abs(val)) + ";";
         unsigned char buffer[4096];
+
+        // QString cmd = "GroupJogModeEnable(Group1)";
 
         if(val > 0)
         {
@@ -200,6 +206,7 @@ void FreejogWindow::moveEngine1To()
 {
     if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
     {
+#if 0
         QString cmd = "1VA" + QString::number(ui->doubleSpinBox_3->value()) + ";";
         unsigned char buffer[4096];
 
@@ -213,8 +220,23 @@ void FreejogWindow::moveEngine1To()
             DCS::Control::UnitTarget::ESP301,
             str
         );
-    
+
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#else
+        unsigned char buffer[4096];
+        DCS::Utils::BasicString str;
+        QString cmd = "GroupMoveAbsolute(Group1.Pos," + QString::number(ui->doubleSpinBox->value()) + ")";
+        memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_IssueGenericCommand,
+            DCS::Control::UnitTarget::XPSRLD4,
+            str
+        );
+
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
+    
     }
     else
     {
@@ -226,6 +248,7 @@ void FreejogWindow::moveEngine2To()
 {
     if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
     {
+#if 0
         QString cmd = "2VA" + QString::number(ui->doubleSpinBox_3->value()) + ";";
         unsigned char buffer[4096];
 
@@ -241,6 +264,21 @@ void FreejogWindow::moveEngine2To()
         );
     
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#else
+
+        unsigned char buffer[4096];
+        DCS::Utils::BasicString str;
+        QString cmd = "GroupMoveAbsolute(Group2.Pos," + QString::number(ui->doubleSpinBox->value()) + ")";
+        memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
+
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_IssueGenericCommand,
+            DCS::Control::UnitTarget::XPSRLD4,
+            str
+        );
+
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
     }
     else
     {
@@ -284,6 +322,7 @@ void FreejogWindow::enableFreejog(bool e)
     }
     else
     {
+#if 0
         // Get default values for engines acc and vel
         unsigned char buffer[1024];
 
@@ -305,6 +344,31 @@ void FreejogWindow::enableFreejog(bool e)
 
         ui->doubleSpinBox_3->setValue(atof((*(DCS::Utils::BasicString*)max_vel.ptr).buffer));
         ui->doubleSpinBox_4->setValue(atof((*(DCS::Utils::BasicString*)max_acc.ptr).buffer));
+#else
+        // Get default values for engines acc and vel
+        unsigned char buffer[1024];
+
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "GroupKill(Group1)" }
+            );
+        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "GroupInitialize(Group1)" }
+            );
+        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_IssueGenericCommand,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "GroupHomeSearch(Group1)" }
+            );
+        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
     }
 
     is_enabled = e;
