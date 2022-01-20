@@ -68,10 +68,11 @@ public:
         return dynamic_cast<W*>(it.value());
     }
 
-    inline void AddStatusWidget(const QString& name, QWidget* w)
+    inline void AddStatusWidget(const QString& name, QWidget* w, bool atFront = true)
     {
         status_widgets.insert(name, w);
-        status_bar->addPermanentWidget(w);
+        if(atFront) status_widgets_loadOrder.push_front(w);
+        else status_widgets_loadOrder.push_back(w);
     }
 
     inline void AdjustStatus()
@@ -112,6 +113,16 @@ private:
     void RemoveLayout(const QString& action, const QString& menu);
     void AddGenericWindow(const QString& title, QWidget* window, const QIcon& icon, const QString& menu, const ads::DockWidgetArea area);
     void AddMenu(const QString& name);
+    void UpdateCPULoad();
+
+    inline void LoadStatusWidgetsOrdered()
+    {
+        for(auto w : status_widgets_loadOrder)
+        {
+            status_bar->addPermanentWidget(w);
+        }
+        status_widgets_loadOrder.clear();
+    }
 
 
 private:
@@ -123,7 +134,11 @@ private:
     QMap<QString, ads::CDockWidget*> docks;
 
     QMap<QString, QWidget*> status_widgets;
+    QVector<QWidget*> status_widgets_loadOrder;
 
     QApplication* app;
     QString lastLayout;
+
+    QTimer* cpuLoadTimer;
+    QLabel* cpuLoadText;
 };

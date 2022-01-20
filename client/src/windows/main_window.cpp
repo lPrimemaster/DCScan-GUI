@@ -25,6 +25,8 @@
 #include "mcaspectrum_window.h"
 #include "acquisitioncontrol_window.h"
 
+#include <Windows.h>
+
 void MainWindow::AddSeparator(const QString& menu)
 {
 	auto pmenu = menuBar()->findChild<QMenu*>(menu);
@@ -141,6 +143,39 @@ void MainWindow::SetSubWIcon(const QString& title, QIcon icon)
 	docks.value(title)->setIcon(icon);
 }
 
+static unsigned long long FileTimeToInt64(const FILETIME & ft) 
+{
+	return (((unsigned long long)(ft.dwHighDateTime))<<32)|((unsigned long long)ft.dwLowDateTime);
+}
+
+void MainWindow::UpdateCPULoad()
+{
+	FILETIME idleTime, kernelTime, userTime;
+	GetSystemTimes(&idleTime, &kernelTime, &userTime);
+
+	long long idleTicks  = FileTimeToInt64(idleTime);
+	long long totalTicks = FileTimeToInt64(kernelTime) + FileTimeToInt64(userTime);
+
+	static unsigned long long _previousTotalTicks = 0;
+	static unsigned long long _previousIdleTicks = 0;
+
+	unsigned long long totalTicksSinceLastTime = totalTicks-_previousTotalTicks;
+	unsigned long long idleTicksSinceLastTime  = idleTicks-_previousIdleTicks;
+
+	float load = 1.0f-((totalTicksSinceLastTime > 0) ? ((float)idleTicksSinceLastTime)/totalTicksSinceLastTime : 0);
+
+	_previousTotalTicks = totalTicks;
+	_previousIdleTicks  = idleTicks;
+
+	float loadPct = load * 100;
+
+	static char buffer[32];
+
+	sprintf_s(buffer, "CPU: %4.1f%%", loadPct);
+
+	cpuLoadText->setText(buffer);
+}
+
 MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 {
 	// Set globally usable app
@@ -226,6 +261,22 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	dock_manager->openPerspective("Default");
 
 	IssueStatusBarText("Ready.");
+
+	// Create a CPU load display on the status bar.
+	QWidget* cpuload_indicator = new QWidget(this);
+	cpuload_indicator->setLayout(new QHBoxLayout());
+
+	cpuLoadText = new QLabel("CPU: 0.0%", this);
+	cpuload_indicator->layout()->addWidget(cpuLoadText);
+	cpuload_indicator->layout()->setContentsMargins(0, 0, 0, 0);
+	cpuload_indicator->setToolTip("Displays client CPU total load.");
+	AddStatusWidget("CPUIndicator", cpuload_indicator);
+
+	cpuLoadTimer = new QTimer(this);
+	(void)connect(cpuLoadTimer, &QTimer::timeout, this, &MainWindow::UpdateCPULoad);
+    cpuLoadTimer->start(1000);
+
+	LoadStatusWidgetsOrdered();
 
 	// Maximize window on app start
 	showMaximized();
