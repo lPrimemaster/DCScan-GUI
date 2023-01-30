@@ -15,7 +15,7 @@ set(CMAKE_EXE_LINKER_FLAGS "/IGNORE:4217 /NODEFAULTLIB:libcmt.lib")
 
 # For Qt
 #set(CMAKE_PREFIX_PATH "H:/Qt/5.15.1/msvc2019_64")
-set(CMAKE_PREFIX_PATH "D:/Qt/5.15.1/msvc2019_64")
+set(CMAKE_PREFIX_PATH "C:/qt-5.15.5/qt-everywhere-src-5.15.5")
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Charts Multimedia REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Charts Multimedia REQUIRED)

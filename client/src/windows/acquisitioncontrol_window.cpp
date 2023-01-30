@@ -131,6 +131,7 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
         auto max_clk_data = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
         DCS::f64 max_clk = *(DCS::f64*)max_clk_data.ptr;
         double rate = max_clk; // TODO : Allow user to select rate
+        // rate = 1000.0;
 
         for(auto task : channels.keys())
         {
