@@ -7,17 +7,11 @@
 
 int main(int argc, char* argv[])
 {
-	printf("0\n");
-
 	// Initialize Logger
 	DCS::Utils::Logger::Init(DCS::Utils::Logger::Verbosity::DEBUG);
 
-	printf("1\n");
-
 	// Initialize network services
 	DCS::Network::Init();
-
-	printf("1\n");
 
 	// Initialize control services
 	DCS::Control::StartServices();
