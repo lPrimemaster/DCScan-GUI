@@ -24,6 +24,7 @@
 #include "spectraldisplay_window.h"
 #include "mcaspectrum_window.h"
 #include "acquisitioncontrol_window.h"
+#include "clinometer_window.h"
 
 void MainWindow::AddSeparator(const QString& menu)
 {
@@ -208,6 +209,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto mcaspectrum_window         = new MCASpectrumWindow(this);
 	auto mcaspectrum_window_icon    = QIcon(":/png/mcaspectrum_window.png");
 	AddGenericWindow("MCA Spectrum", mcaspectrum_window , mcaspectrum_window_icon , "View", ads::NoDockWidgetArea);
+
+	auto clinometer_window         = new ClinometerWindow(this);
+	auto clinometer_window_icon    = QIcon(":/png/clinometer_window.png"); // TODO: arranjar um ícone para a janela
+	AddGenericWindow("Clinometer Monitoring", clinometer_window , clinometer_window_icon , "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

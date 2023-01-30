@@ -7,29 +7,23 @@
 
 int main(int argc, char* argv[])
 {
+	printf("0\n");
+
 	// Initialize Logger
 	DCS::Utils::Logger::Init(DCS::Utils::Logger::Verbosity::DEBUG);
 
+	printf("1\n");
+
 	// Initialize network services
 	DCS::Network::Init();
+
+	printf("1\n");
 
 	// Initialize control services
 	DCS::Control::StartServices();
 
 	// Initialize acquisition services
 	DCS::DAQ::Init();
-
-	std::atomic<bool> stop = false;
-
-	// std::thread t([&] { 
-	// 		std::this_thread::sleep_for(std::chrono::milliseconds(5000)); 
-
-	// 		while (!stop.load())
-	// 		{ 
-	// 			DCS::Network::Message::FibSeqEvt();
-	// 			std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-	// 		}
-	// });
 
 	auto listen = DCS::Network::Server::Create(15777);
 
@@ -46,8 +40,6 @@ int main(int argc, char* argv[])
 	DCS::Network::Destroy();
 
 	DCS::Utils::Logger::Destroy();
-
-	stop.store(true);
 
 	return 0;
 }
