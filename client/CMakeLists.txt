@@ -83,6 +83,8 @@ set(SOURCE
 	src/autogen_macros.h # Ui autogen friendly macros
 )
 
+# add_subdirectory(submodules/Qt-Advanced-Docking-System)
+
 if(DEBUG_BUILD)
 	add_executable(DCScan-Client # Enable console if in debug mode
 		${SOURCE}

@@ -3,8 +3,6 @@
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Core/include/DCS_ModuleCore.h>
 
-#include <atomic>
-
 int main(int argc, char* argv[])
 {
 	// Initialize Logger
