@@ -136,7 +136,7 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
         for(auto task : channels.keys())
         {
             int ch = channels[task];
-            QString channel_name = "PXI_Slot2/ai" + QString::number(ch);
+            QString channel_name = "Dev1/ai" + QString::number(ch);
             QString task_name = "Task_" + task;
             DCS::Utils::BasicString tname;
             DCS::Utils::BasicString cname;

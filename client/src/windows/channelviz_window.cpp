@@ -52,7 +52,7 @@ void ChannelvizWindow::requestAIStart()
     // No need to check for connection, since button is disabled when disconnected
 
     // BUG : Make the PXI SLOT name an option!
-    QString channel = "PXI_Slot2/" + ui->comboBox->currentText();
+    QString channel = "Dev1/" + ui->comboBox->currentText();
     DCS::DAQ::ChannelRef ref;
 
     switch (ui->comboBox_3->currentIndex())
