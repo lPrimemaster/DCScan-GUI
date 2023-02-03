@@ -84,7 +84,7 @@ static void ConnectNet(QString username, QString password, QString ip, QString p
 
 	DCS::Network::Client::Authenticate(socket, username.toLatin1().constData(), password.toLatin1().constData());
 
-	qDebug() << "Connect OK || SOCKET id = " << (uint)socket;
+	qDebug() << "Connect OK";
 
 	if (DCS::Network::Client::StartThread(socket))
 	{
@@ -129,7 +129,7 @@ static void DisconnectLocal(DCS::Network::Socket socket)
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 }
 
-void ConnectWindow::disconnectFromServer()
+SimpleThread* ConnectWindow::disconnectFromServerInternal()
 {
 	// TODO : Cancel any jobs if they are running
 	if(net_connected)
@@ -142,12 +142,25 @@ void ConnectWindow::disconnectFromServer()
 		(void)connect(workerThread, &SimpleThread::jobDone, ss, &LoadingSplash::finishExec);
 		(void)connect(workerThread, &SimpleThread::finished, workerThread, &QObject::deleteLater);
 		workerThread->start();
+		return workerThread;
 	}
+	return nullptr;
+}
+
+void ConnectWindow::disconnectFromServer()
+{
+	(void)disconnectFromServerInternal();
+}
+
+void ConnectWindow::disconnectFromServerWait()
+{
+	disconnectFromServerInternal()->wait();
 }
 
 ConnectWindow::~ConnectWindow()
 {
-	disconnectFromServer();
+	LOG_DEBUG("~ConnectWindow()");
+	disconnectFromServerWait();
 	DCS::Network::Destroy();
 	delete ui;
 }

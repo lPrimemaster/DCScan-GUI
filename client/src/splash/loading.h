@@ -8,6 +8,7 @@
 #include <QLayout>
 #include <QLabel>
 #include <QFont>
+#include <QWindow>
 
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
 
@@ -16,7 +17,7 @@ class LoadingSplash : public QSplashScreen
 	Q_OBJECT
 
 private:
-	LoadingSplash(QWidget* parent = nullptr) : QSplashScreen(parent)
+	LoadingSplash(QWidget* parent = nullptr) : QSplashScreen(parent->window()->windowHandle()->screen())
     {
         (void)connect(this, &LoadingSplash::changeDisplayMessage, this, &LoadingSplash::setWorkingStatus);
 
