@@ -134,10 +134,18 @@ add_custom_command(TARGET DCScan-Client POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E make_directory
 	$<TARGET_FILE_DIR:DCScan-Client>/styles
 )
+
 # Copy default style
 add_custom_command(TARGET DCScan-Client POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different
 	${CMAKE_CURRENT_SOURCE_DIR}/styles/default.css
 	$<TARGET_FILE_DIR:DCScan-Client>/styles/
+)
+
+# Copy default perspective
+add_custom_command(TARGET DCScan-Client POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${CMAKE_CURRENT_SOURCE_DIR}/settings/ads_perspectives.ini
+	$<TARGET_FILE_DIR:DCScan-Client>
 )
 

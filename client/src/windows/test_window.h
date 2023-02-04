@@ -37,4 +37,5 @@ private:
 	QApplication* a;
 
 	ads::CDockManager* manager;
+	MainWindow* mainwindow;
 };

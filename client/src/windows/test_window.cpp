@@ -7,7 +7,7 @@
 
 void TestWindow::applyStyle()
 {
-	QFile f("../../../client/styles/default.css");
+	QFile f("styles/default.css");
 	f.open(QFile::ReadOnly | QFile::Text);
 	QTextStream in(&f);
 
@@ -23,17 +23,22 @@ void TestWindow::applyStyle()
 void TestWindow::overrideADSDefaultPerspective()
 {
 	QSettings s("ads_perspectives.ini", QSettings::Format::IniFormat);
+	auto* dock = mainwindow->GetDock("Debug Window");
+	dock->toggleView(false);
 	manager->addPerspective("Default");
 	manager->savePerspectives(s);
+	dock->toggleView(true);
 }
 
 TestWindow::TestWindow(QWidget* parent) : ui(new Ui::TestWindow)
 {
 	ui->setupUi(this);
 
-	a = dynamic_cast<MainWindow*>(parent)->GetApp();
+	mainwindow = dynamic_cast<MainWindow*>(parent);
 
-	manager = dynamic_cast<MainWindow*>(parent)->GetDockManager();
+	a = mainwindow->GetApp();
+
+	manager = mainwindow->GetDockManager();
 
 	(void)connect(ui->btn_reload_css, &QPushButton::clicked, this, &TestWindow::applyStyle);
 
