@@ -28,6 +28,7 @@ ChannelvizWindow::ChannelvizWindow(QWidget* parent) : ui(new Ui::ChannelvizWindo
 
     series->replace(points);
     ui->plot->chart()->addSeries(series);
+    ui->plot->chart()->legend()->hide();
 
     QValueAxis* axis_x = new QValueAxis();
 	QValueAxis* axis_y = new QValueAxis();
