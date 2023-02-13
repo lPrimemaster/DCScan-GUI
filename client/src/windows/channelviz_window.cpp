@@ -85,7 +85,13 @@ ChannelvizWindow::~ChannelvizWindow()
 void ChannelvizWindow::requestAIStart()
 {
     // No need to check for connection, since button is disabled when disconnected
+<<<<<<< HEAD
     QString channel = ui->comboBox_9->currentText() + "/" + ui->comboBox->currentText();
+=======
+
+    // BUG : Make the PXI SLOT name an option!
+    QString channel = "Dev1/" + ui->comboBox->currentText();
+>>>>>>> e9af327... Suspicious crashing.
     DCS::DAQ::ChannelRef ref;
 
     switch (ui->comboBox_3->currentIndex())

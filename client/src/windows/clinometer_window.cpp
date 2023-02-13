@@ -54,8 +54,8 @@ void ClinometerWindow::requestAIStart()
 
     size = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_DAQ_ClinometerEvent, [](DCS::u8* data, DCS::u8* userData) {
         // Output vindo do ClinometerEvent() do servidor
-        DCS::DAQ::ClinometerEventData cdata = *(DCS::DAQ::ClinometerEventData*)data;
-
+        DCS::DAQ::ClinometerEventData evt_data = *(DCS::DAQ::ClinometerEventData*)data;
+        
         // TODO
 
     }, (DCS::u8*)this);
