@@ -97,7 +97,7 @@ void ChannelvizWindow::requestAIStart()
         case 4: ref = DCS::DAQ::ChannelRef::PseudoDifferential; break;
         default: LOG_ERROR("ChannelViz combobox unexpected index."); break;
     }
-
+    
     double rate = ui->doubleSpinBox->value() * 1000;
 
     DCS::Utils::BasicString cname = { "T_ChannelViz" };

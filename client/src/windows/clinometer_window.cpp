@@ -30,7 +30,7 @@ void ClinometerWindow::requestAIStart()
     DCS::DAQ::ChannelRef ref = DCS::DAQ::ChannelRef::SingleEnded;
 
     // Sample rate in samples per sec
-    double rate = 1000;
+    double rate = 10000;
 
     DCS::Utils::BasicString cname0 = { "Axis0" };
     DCS::Utils::BasicString str0;
