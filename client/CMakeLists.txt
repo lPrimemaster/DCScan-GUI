@@ -70,6 +70,10 @@ set(SOURCE
 	src/windows/acquisitioncontrol_window.cpp
 	src/windows/acquisitioncontrol_window.ui
 
+	src/windows/clinometer_window.h
+	src/windows/clinometer_window.cpp
+	src/windows/clinometer_window.ui
+
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui
 
@@ -81,6 +85,8 @@ set(SOURCE
 
 	src/autogen_macros.h # Ui autogen friendly macros
 )
+
+# add_subdirectory(submodules/Qt-Advanced-Docking-System)
 
 if(DEBUG_BUILD)
 	add_executable(DCScan-Client # Enable console if in debug mode
@@ -125,4 +131,24 @@ else()
 	    "${DCSMODULESAPI_INCLUDE_DIRS}"
 	    ${CMAKE_CURRENT_SOURCE_DIR}/lib/qtadvanceddocking/include)
 endif()
+
+# Copy aditional files when building
+add_custom_command(TARGET DCScan-Client POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory
+	$<TARGET_FILE_DIR:DCScan-Client>/styles
+)
+
+# Copy default style
+add_custom_command(TARGET DCScan-Client POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${CMAKE_CURRENT_SOURCE_DIR}/styles/default.css
+	$<TARGET_FILE_DIR:DCScan-Client>/styles/
+)
+
+# Copy default perspective
+add_custom_command(TARGET DCScan-Client POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${CMAKE_CURRENT_SOURCE_DIR}/settings/ads_perspectives.ini
+	$<TARGET_FILE_DIR:DCScan-Client>
+)
 

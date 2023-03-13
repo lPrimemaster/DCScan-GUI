@@ -47,10 +47,14 @@ private:
 public slots:
 	void connectToServer(QString username, QString password);
 	void disconnectFromServer();
+	void disconnectFromServerWait();
 	void changeSettings(bool v);
 
 signals:
 	void connectionChanged(bool connected);
+
+private:
+	SimpleThread* disconnectFromServerInternal();
 
 private:
 	Ui::ConnectWindow* ui;

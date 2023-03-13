@@ -131,11 +131,12 @@ AcquisitionControlWindow::AcquisitionControlWindow(QWidget* parent) : ui(new Ui:
         auto max_clk_data = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
         DCS::f64 max_clk = *(DCS::f64*)max_clk_data.ptr;
         double rate = max_clk; // TODO : Allow user to select rate
+        // rate = 1000.0;
 
         for(auto task : channels.keys())
         {
             int ch = channels[task];
-            QString channel_name = "PXI_Slot2/ai" + QString::number(ch);
+            QString channel_name = "Dev1/ai" + QString::number(ch);
             QString task_name = "Task_" + task;
             DCS::Utils::BasicString tname;
             DCS::Utils::BasicString cname;

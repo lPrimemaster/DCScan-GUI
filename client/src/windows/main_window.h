@@ -46,6 +46,18 @@ public:
         return dynamic_cast<W*>(it.value());
     }
 
+    // TODO: This should instead be on a "MyWindow" child class
+    inline ads::CDockWidget* GetDock(const QString& name)
+    {
+        auto it = docks.find(name);
+        if(it == docks.end())
+        {
+            LOG_ERROR("Could not find dock named %s.", name.toLatin1().toStdString().c_str());
+            return nullptr;
+        }
+        return it.value();
+    }
+
     /**
      * @brief Display a status message in the man window's status bar.
      * 

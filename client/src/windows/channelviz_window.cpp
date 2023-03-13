@@ -7,8 +7,42 @@ ChannelvizWindow::ChannelvizWindow(QWidget* parent) : ui(new Ui::ChannelvizWindo
 
     auto connect_window = dynamic_cast<MainWindow*>(parent)->GetWindow<ConnectWindow>("Remote Control");
 
-    (void)connect(connect_window, SIGNAL(connectionChanged(bool)), ui->pushButton, SLOT(setEnabled(bool)), Qt::QueuedConnection);
     (void)connect(this, SIGNAL(gotBufferSamples(QVector<QPointF>)), this, SLOT(drawGraphFull(QVector<QPointF>)), Qt::QueuedConnection);
+
+    // This makes the device combo box update based on the connection status
+    // TODO: Add a polling rate for new devices (assume PnP NI devices) 
+    (void)connect(connect_window, &ConnectWindow::connectionChanged, this, [&](bool status) {
+        if(status)
+        {
+            unsigned char buffer[4096];
+            auto size = DCS::Registry::SVParams::GetDataFromParams(buffer, SV_CALL_DCS_DAQ_GetConnectedDevicesAliases);
+            auto devices_ptr = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
+
+            ui->comboBox_9->clear();
+
+            if(devices_ptr.ptr[0] == '\0')
+            {
+                LOG_ERROR("No NI devices detected upon connecting to server.");
+                ui->comboBox_9->addItem("No Devices");
+                ui->comboBox_9->setEnabled(false);
+                ui->pushButton->setEnabled(false);
+            }
+            else
+            {
+                QString devices(((DCS::Utils::BasicString*)(devices_ptr.ptr))->buffer);
+                ui->comboBox_9->addItems(devices.split(','));
+                ui->comboBox_9->setEnabled(true);
+                ui->pushButton->setEnabled(true);
+            }
+        }
+        else
+        {
+            ui->comboBox_9->clear();
+            ui->comboBox_9->addItem("No Connection");
+            ui->comboBox_9->setEnabled(false);
+            ui->pushButton->setEnabled(false);
+        }
+    }, Qt::QueuedConnection);
 
     (void)connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(requestAIStart()));
     (void)connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(requestAIStop()));
@@ -28,6 +62,7 @@ ChannelvizWindow::ChannelvizWindow(QWidget* parent) : ui(new Ui::ChannelvizWindo
 
     series->replace(points);
     ui->plot->chart()->addSeries(series);
+    ui->plot->chart()->legend()->hide();
 
     QValueAxis* axis_x = new QValueAxis();
 	QValueAxis* axis_y = new QValueAxis();
@@ -50,9 +85,7 @@ ChannelvizWindow::~ChannelvizWindow()
 void ChannelvizWindow::requestAIStart()
 {
     // No need to check for connection, since button is disabled when disconnected
-
-    // BUG : Make the PXI SLOT name an option!
-    QString channel = "PXI_Slot2/" + ui->comboBox->currentText();
+    QString channel = ui->comboBox_9->currentText() + "/" + ui->comboBox->currentText();
     DCS::DAQ::ChannelRef ref;
 
     switch (ui->comboBox_3->currentIndex())
@@ -64,10 +97,10 @@ void ChannelvizWindow::requestAIStart()
         case 4: ref = DCS::DAQ::ChannelRef::PseudoDifferential; break;
         default: LOG_ERROR("ChannelViz combobox unexpected index."); break;
     }
-
+    
     double rate = ui->doubleSpinBox->value() * 1000;
 
-    DCS::Utils::BasicString cname = { "Test_ChannelViz" };
+    DCS::Utils::BasicString cname = { "T_ChannelViz" };
     DCS::Utils::BasicString str;
     memcpy(str.buffer, channel.toStdString().c_str(), channel.toStdString().size() + 1);
 
@@ -114,7 +147,7 @@ void ChannelvizWindow::requestAIStop()
 
     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
-    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteAIVChannel, { "Test_ChannelViz" });
+    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteAIVChannel, { "T_ChannelViz" });
 
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 

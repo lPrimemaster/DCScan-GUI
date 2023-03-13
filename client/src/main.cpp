@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
 	a.setPalette(pal);
 
-	QFile f("../../../client/styles/default.css");
+	QFile f("styles/default.css");
 	if (!f.open(QFile::ReadOnly | QFile::Text))
 	{
 		LOG_ERROR("Failed to load stylesheet. Maybe location is wrong?");

@@ -4,8 +4,6 @@
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_Acquisition/include/DCS_ModuleAcquisition.h>
 
-#include <atomic>
-
 int main(int argc, char* argv[])
 {
 	// Initialize Logger

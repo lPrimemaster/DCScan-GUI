@@ -11,31 +11,32 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
+#include <QTimer>
+#include <QLineSeries>
+#include <QValueAxis>
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
 #include <DCS_Utils/include/DCS_ModuleUtils.h>
+#include <DCS_Network/include/DCS_ModuleNetwork.h>
 
 #include "main_window.h"
+#include "connect_window.h"
 
-UI_AUTOGEN(TestWindow)
+UI_AUTOGEN(ClinometerWindow)
 
-class TestWindow : public QWidget
+class ClinometerWindow : public QWidget
 {
 	Q_OBJECT
 
 public:
-	TestWindow(QWidget* parent = nullptr);
-	~TestWindow();
+	ClinometerWindow(QWidget* parent = nullptr);
+	~ClinometerWindow();
 
-	void applyStyle();
-
-	void overrideADSDefaultPerspective();
+public slots:
+    void requestAIStart();
+    void requestAIStop();
 
 private:
-	Ui::TestWindow* ui;
-	QApplication* a;
-
-	ads::CDockManager* manager;
-	MainWindow* mainwindow;
+	Ui::ClinometerWindow* ui;
 };
