@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
 	DCS::DAQ::Init();
 
 	// Initializes encoder services
-	DCS::f64 per_rev[] = {36000.0, 0.0, 0.0, 36000.0};
-	DCS::ENC::Init("10.80.0.99", 0b1001, per_rev);
+	DCS::f64 per_rev[] = {36000.0, 36000.0, 36000.0, 36000.0};
+	DCS::ENC::Init("10.80.0.99", 0b1010, per_rev);
 
 	auto listen = DCS::Network::Server::Create(15777);
 

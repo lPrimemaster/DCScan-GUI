@@ -12,6 +12,8 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QTimer>
+#include <QLineSeries>
+#include <QValueAxis>
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
@@ -36,8 +38,25 @@ public slots:
     void update();
     void resetTimer();
 
+    void drawGraphsRolling();
+
+signals:
+    void appendToGraphs();
+
 private:
-	Ui::PositionWindow* ui;
+	void insertRollingData(QVector<QPointF>& vector, const QPointF& data);
+    
+    Ui::PositionWindow* ui;
     QTimer* timer;
     ConnectWindow* connect_window;
+
+    QtCharts::QLineSeries* series1;
+    QtCharts::QLineSeries* series2;
+    QVector<QPointF> points1;
+    QVector<QPointF> points2;
+
+    QtCharts::QValueAxis* axis_x1;
+	QtCharts::QValueAxis* axis_y1;
+    QtCharts::QValueAxis* axis_x2;
+	QtCharts::QValueAxis* axis_y2;
 };

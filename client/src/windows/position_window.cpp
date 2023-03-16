@@ -5,9 +5,53 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow)
 {
     connect_window = dynamic_cast<MainWindow*>(parent)->GetWindow<ConnectWindow>("Remote Control");
 
-
     ui->setupUi(this);
     (void)connect(ui->doubleSpinBox, SIGNAL(editingFinished()), this, SLOT(resetTimer()));
+
+    (void)connect(this, SIGNAL(appendToGraphs()), this, SLOT(drawGraphsRolling()), Qt::QueuedConnection);
+
+    series1 = new QLineSeries();
+    series2 = new QLineSeries();
+
+    QVector<QPointF> points(1000);
+    for(int i = 0; i < points.size(); i++)
+    {
+        points[i].setX(i);
+        points[i].setY(0);
+    }
+
+    // TODO: Fetch the theme colors instead
+    series1->setColor(QColor("#ed7e00"));
+    series2->setColor(QColor("#ed7e00"));
+
+    series1->replace(points);
+    series2->replace(points);
+    ui->angle1_plot->chart()->addSeries(series1);
+    ui->angle2_plot->chart()->addSeries(series2);
+    ui->angle1_plot->chart()->legend()->hide();
+    ui->angle2_plot->chart()->legend()->hide();
+
+    axis_x1 = new QValueAxis();
+	axis_y1 = new QValueAxis();
+	axis_x1->setRange(0, 1000);
+	axis_y1->setRange(42.424, 42.425);
+
+    axis_x2 = new QValueAxis();
+	axis_y2 = new QValueAxis();
+    axis_x2->setRange(0, 1000);
+	axis_y2->setRange(0.0001, 0.0002);
+
+	ui->angle1_plot->chart()->addAxis(axis_x1, Qt::AlignBottom);
+	ui->angle1_plot->chart()->addAxis(axis_y1, Qt::AlignLeft);
+    
+    ui->angle2_plot->chart()->addAxis(axis_x2, Qt::AlignBottom);
+	ui->angle2_plot->chart()->addAxis(axis_y2, Qt::AlignLeft);
+
+	series1->attachAxis(axis_x1);
+	series1->attachAxis(axis_y1);
+    
+	series2->attachAxis(axis_x2);
+	series2->attachAxis(axis_y2);
     
     timer = new QTimer(this);
     (void)connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -122,12 +166,30 @@ void PositionWindow::update()
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_ENC_InspectLastEncoderValues
             );
-        
         auto enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
         DCS::ENC::EncoderData data = (*(DCS::ENC::EncoderData*)enc.ptr);
-        ui->doubleSpinBox_2->setDecimals(8);
-        ui->doubleSpinBox_2->setValue(data.axis[0].calpos);
-        // ui->doubleSpinBox_3->setValue(data.axis[1].calpos);
+
+        ui->doubleSpinBox_2->setDecimals(6);
+        ui->doubleSpinBox_2->setValue(data.axis[1].calpos); // Axis X12
+        ui->doubleSpinBox_3->setDecimals(6);
+        ui->doubleSpinBox_3->setValue(data.axis[3].calpos); // Axis X14
+
+        static int i = 0;
+        QPointF p1(i, data.axis[1].calpos);
+        QPointF p2(i, data.axis[3].calpos);
+        if(i < 1000) i++;
+
+        insertRollingData(points1, p1);
+        insertRollingData(points2, p2);
+
+        auto [miny1, maxy1] = std::minmax_element(points1.begin(), points1.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
+
+        auto [miny2, maxy2] = std::minmax_element(points2.begin(), points2.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
+
+        axis_y1->setRange(miny1->y(), maxy1->y());
+	    axis_y2->setRange(miny2->y(), maxy2->y());
+
+        emit appendToGraphs();
 #endif
     }
 }
@@ -145,5 +207,24 @@ void PositionWindow::resetTimer()
     else
     {
         timer->stop();
+    }
+}
+
+void PositionWindow::drawGraphsRolling()
+{
+    series1->replace(points1);
+    series2->replace(points2);
+}
+
+void PositionWindow::insertRollingData(QVector<QPointF>& vector, const QPointF& data)
+{
+    vector.append(data);
+    if(vector.size() >= 1000)
+    {
+        for(int i = 0; i < vector.size(); i++)
+        {
+            vector[i].setX(vector[i].x() - 1.0);
+        }
+        vector.removeFirst();
     }
 }
