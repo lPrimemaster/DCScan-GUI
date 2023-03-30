@@ -37,6 +37,7 @@ public:
 public slots:
     void update();
     void resetTimer();
+    void resetGraphPeriod();
 
     void drawGraphsRolling();
 
@@ -46,6 +47,9 @@ signals:
 private:
 	void insertRollingData(QVector<QPointF>& vector, const QPointF& data);
     
+    DCS::u32 encoder_period;
+    int max_graph_points;
+    int graphx_span;
     Ui::PositionWindow* ui;
     QTimer* timer;
     ConnectWindow* connect_window;

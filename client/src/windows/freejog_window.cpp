@@ -9,23 +9,19 @@ FreejogWindow::FreejogWindow(QWidget* parent) : ui(new Ui::FreejogWindow)
     ui->warning_msg->setText("Free motion is disabled.\nConnect to server to enable.");
     enableFreejog(false);
 
-    // NOTE : Connect can use lambdas in Qt5. This would allow to use less specific slots for all engines
-    (void)connect(ui->t1_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine1Free(int)));
-    (void)connect(ui->t2_slider, SIGNAL(valueChanged(int)), this, SLOT(moveEngine2Free(int)));
+    (void)connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(moveEngine1To()));
+    (void)connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(moveEngine2To()));
 
-    (void)connect(ui->doubleSpinBox, SIGNAL(editingFinished()), this, SLOT(moveEngine1To()));
-    (void)connect(ui->doubleSpinBox_2, SIGNAL(editingFinished()), this, SLOT(moveEngine2To()));
+    (void)connect(this, SIGNAL(enableMotionSignal(int, bool)), this, SLOT(enableMotion(int, bool)));
 
     (void)connect(ui->spinBox, &QSpinBox::editingFinished, this, [=](){ moveTiltTo(0, 1, ui->spinBox); });
     (void)connect(ui->spinBox_2, &QSpinBox::editingFinished, this, [=](){ moveTiltTo(0, 2, ui->spinBox_2); });
     (void)connect(ui->spinBox_3, &QSpinBox::editingFinished, this, [=](){ moveTiltTo(1, 1, ui->spinBox_3); });
     (void)connect(ui->spinBox_4, &QSpinBox::editingFinished, this, [=](){ moveTiltTo(1, 2, ui->spinBox_4); });
 
-    (void)connect(ui->t1_slider, SIGNAL(sliderReleased()), this, SLOT(resetSlider1()));
-    (void)connect(ui->t2_slider, SIGNAL(sliderReleased()), this, SLOT(resetSlider2()));
-
-    (void)connect(ui->doubleSpinBox_3, SIGNAL(editingFinished()), this, SLOT(updateVel()));
-    (void)connect(ui->doubleSpinBox_4, SIGNAL(editingFinished()), this, SLOT(updateAcc()));
+    (void)connect(ui->doubleSpinBox_3, SIGNAL(editingFinished()), this, SLOT(updatePIDParams()));
+    (void)connect(ui->doubleSpinBox_4, SIGNAL(editingFinished()), this, SLOT(updatePIDParams()));
+    (void)connect(ui->doubleSpinBox_5, SIGNAL(editingFinished()), this, SLOT(updatePIDParams()));
 }
 
 FreejogWindow::~FreejogWindow()
@@ -33,180 +29,35 @@ FreejogWindow::~FreejogWindow()
     
 }
 
-void FreejogWindow::updateAcc()
+void FreejogWindow::updatePIDParams()
 {
-#if 0
-    double acc = ui->doubleSpinBox_4->value();
-    QString values = 
-         "1AU" + QString::number(acc) + 
-        ";1AC" + QString::number(acc) +
-        ";2AU" + QString::number(acc) + 
-        ";2AC" + QString::number(acc) + ";";
-
-    DCS::Utils::BasicString str;
-    memcpy(str.buffer, values.toStdString().c_str(), values.toStdString().size() + 1);
-    LOG_DEBUG("Updating acceleration: %s.", str.buffer);
+    DCS::f64 Kp = ui->doubleSpinBox_3->value();
+    DCS::f64 Ki = ui->doubleSpinBox_4->value();
+    DCS::f64 Kd = ui->doubleSpinBox_5->value();
 
     unsigned char buffer[4096];
     auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        SV_CALL_DCS_Control_IssueGenericCommand,
-        DCS::Control::UnitTarget::ESP301,
-        str
-    );
+            SV_CALL_DCS_Control_SetPIDControlVariables,
+            DCS::Control::UnitTarget::XPSRLD4,
+            DCS::Utils::BasicString{ "Group4" },
+            DCS::i8(2), Kp, Ki, Kd
+        );
+    DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-    DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-#endif
-}
-
-void FreejogWindow::updateVel()
-{
-#if 0
-    double vel = ui->doubleSpinBox_3->value();
-    QString values = 
-         "1VU" + QString::number(vel) + 
-        ";2VU" + QString::number(vel) + ";";
-
-    DCS::Utils::BasicString str;
-    memcpy(str.buffer, values.toStdString().c_str(), values.toStdString().size() + 1);
-    LOG_DEBUG("Updating velocity: %s.", str.buffer);
-
-    unsigned char buffer[4096];
-    auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        SV_CALL_DCS_Control_IssueGenericCommand,
-        DCS::Control::UnitTarget::ESP301,
-        str
-    );
-
-    DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-#endif
-}
-
-// TODO : Refactor this to avoid writting unecessary LOC's
-void FreejogWindow::moveEngine1Free(int val)
-{
-    if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
-    {
-        QString cmd = "1VA" + QString::number((ui->doubleSpinBox_3->value() / 5.0) * abs(val)) + ";";
-        unsigned char buffer[4096];
-
-        // QString cmd = "GroupJogModeEnable(Group1)";
-
-        if(val > 0)
-        {
-            cmd += "1PR+360;"; // Move 360 deg relative to pos
-
-            DCS::Utils::BasicString str;
-            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::ESP301,
-                str
-            );
-        
-            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        }
-        else if(val == 0)
-        {
-            cmd = "1ST;";
-
-            DCS::Utils::BasicString str;
-            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::ESP301,
-                str
-            );
-        
-            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        }
-        else
-        {
-            cmd += "1PR-360;"; // Move 360 deg relative to pos
-
-            DCS::Utils::BasicString str;
-            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::ESP301,
-                str
-            );
-        
-            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        }
-    }
-    else
-    {
-        LOG_ERROR("Cannot move engine 1: acceleration or velocity value is zero.");
-    }
-}
-
-void FreejogWindow::moveEngine2Free(int val)
-{
-    if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
-    {
-        QString cmd = "2VA" + QString::number((ui->doubleSpinBox_3->value() / 5.0) * abs(val)) + ";";
-        unsigned char buffer[4096];
-
-        if(val > 0)
-        {
-            cmd += "2PR+360;"; // Move 360 deg relative to pos
-
-            DCS::Utils::BasicString str;
-            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::ESP301,
-                str
-            );
-        
-            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        }
-        else if(val == 0)
-        {
-            cmd = "2ST;";
-
-            DCS::Utils::BasicString str;
-            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::ESP301,
-                str
-            );
-        
-            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        }
-        else
-        {
-            cmd += "2PR-360;"; // Move 360 deg relative to pos
-
-            DCS::Utils::BasicString str;
-            memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::ESP301,
-                str
-            );
-        
-            DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        }
-    }
-    else
-    {
-        LOG_ERROR("Cannot move engine 2: acceleration or velocity value is zero.");
-    }
+    // size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+    //         SV_CALL_DCS_Control_SetPIDControlVariables,
+    //         DCS::Control::UnitTarget::XPSRLD4,
+    //         DCS::Utils::BasicString{ "Group2" },
+    //         DCS::i8(4), Kp, Ki, Kd
+    //     );
+    // DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 }
 
 void FreejogWindow::moveEngine1To()
 {
+#if 0
     if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
     {
-#if 0
         QString cmd = "1VA" + QString::number(ui->doubleSpinBox_3->value()) + ";";
         unsigned char buffer[4096];
 
@@ -222,26 +73,22 @@ void FreejogWindow::moveEngine1To()
         );
 
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-#else
-        unsigned char buffer[4096];
-        DCS::Utils::BasicString str;
-        QString cmd = "GroupMoveAbsolute(Group1.Pos," + QString::number(ui->doubleSpinBox->value()) + ")";
-        memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-            SV_CALL_DCS_Control_IssueGenericCommand,
-            DCS::Control::UnitTarget::XPSRLD4,
-            str
-        );
-
-        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-#endif
-    
     }
     else
     {
         LOG_ERROR("Cannot move engine 1: acceleration or velocity value is zero.");
     }
+#else
+        unsigned char buffer[4096];
+
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_MoveAbsolutePID,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "Group4" },
+                ui->doubleSpinBox->value()
+            );
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
 }
 
 void FreejogWindow::moveEngine2To()
@@ -265,19 +112,15 @@ void FreejogWindow::moveEngine2To()
     
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 #else
+        // unsigned char buffer[4096];
 
-        unsigned char buffer[4096];
-        DCS::Utils::BasicString str;
-        QString cmd = "GroupMoveAbsolute(Group2.Pos," + QString::number(ui->doubleSpinBox->value()) + ")";
-        memcpy(str.buffer, cmd.toLatin1().constData(), cmd.toLatin1().size());
-
-        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-            SV_CALL_DCS_Control_IssueGenericCommand,
-            DCS::Control::UnitTarget::XPSRLD4,
-            str
-        );
-
-        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        // auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        //         SV_CALL_DCS_Control_MoveAbsolutePID,
+        //         DCS::Control::UnitTarget::XPSRLD4,
+        //         DCS::Utils::BasicString{ "Group4" },
+        //         ui->doubleSpinBox->value()
+        //     );
+        // DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 #endif
     }
     else
@@ -303,14 +146,18 @@ void FreejogWindow::moveTiltTo(int stage, int axis, QSpinBox* spin_obj)
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 }
 
-void FreejogWindow::resetSlider1()
+void FreejogWindow::enableMotion(int stage, bool enable)
 {
-    ui->t1_slider->setValue(0);
-}
-
-void FreejogWindow::resetSlider2()
-{
-    ui->t2_slider->setValue(0);
+    if(stage == 0)
+    {
+        ui->pushButton->setEnabled(enable);
+        ui->pushButton->setText(enable ? "Move" : "Working");
+    }
+    else if(stage == 1)
+    {
+        ui->pushButton_2->setEnabled(enable);
+        ui->pushButton_2->setText(enable ? "Move" : "Working");
+    }
 }
 
 // This shall only be called if a connections is established, or an error will be raised
@@ -351,23 +198,41 @@ void FreejogWindow::enableFreejog(bool e)
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_Control_IssueGenericCommand,
                 DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupKill(Group1)" }
+                DCS::Utils::BasicString{ "GroupKill(Group4)" }
             );
         DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
         size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_Control_IssueGenericCommand,
                 DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupInitialize(Group1)" }
+                DCS::Utils::BasicString{ "GroupInitialize(Group4)" }
             );
         DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
         size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_Control_IssueGenericCommand,
                 DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupHomeSearch(Group1)" }
+                DCS::Utils::BasicString{ "GroupHomeSearch(Group4)" }
             );
         DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_SetPIDControlVariables,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "Group4" },
+                DCS::i8(2), -0.9, 0.0, 0.0
+            );
+        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+
+        size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Control_MoveAbsolutePIDChanged, [](DCS::u8* data, DCS::u8* userData) {
+            DCS::Control::PIDStatusGroup* status = (DCS::Control::PIDStatusGroup*)data;
+
+            if (QString(status->group.buffer).contains("Group4"))
+            {
+                emit ((FreejogWindow*)userData)->enableMotionSignal(0, status->status == DCS::Control::PIDStatus::READY);
+            }
+        }, (DCS::u8*)this);
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::EVT_SUB, buffer, size_written);
 #endif
     }
 
@@ -376,16 +241,17 @@ void FreejogWindow::enableFreejog(bool e)
     ui->warning_msg->setVisible(!e);
     ui->warning_sign->setVisible(!e);
 
+    ui->pushButton->setEnabled(e);
+    ui->pushButton_2->setEnabled(e);
+
     ui->doubleSpinBox->setEnabled(e);
     ui->doubleSpinBox_2->setEnabled(e);
     ui->doubleSpinBox_3->setEnabled(e);
     ui->doubleSpinBox_4->setEnabled(e);
+    ui->doubleSpinBox_5->setEnabled(e);
 
     ui->spinBox->setEnabled(e);
     ui->spinBox_2->setEnabled(e);
     ui->spinBox_3->setEnabled(e);
     ui->spinBox_4->setEnabled(e);
-
-    ui->t1_slider->setEnabled(e);
-    ui->t2_slider->setEnabled(e);
 }

@@ -1,12 +1,13 @@
 #include "position_window.h"
 #include "./ui_position_window.h"
 
-PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow)
+PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow), encoder_period(0), max_graph_points(0), graphx_span(10)
 {
     connect_window = dynamic_cast<MainWindow*>(parent)->GetWindow<ConnectWindow>("Remote Control");
 
     ui->setupUi(this);
     (void)connect(ui->doubleSpinBox, SIGNAL(editingFinished()), this, SLOT(resetTimer()));
+    (void)connect(ui->spinBox, SIGNAL(editingFinished()), this, SLOT(resetGraphPeriod()));
 
     (void)connect(this, SIGNAL(appendToGraphs()), this, SLOT(drawGraphsRolling()), Qt::QueuedConnection);
 
@@ -33,13 +34,17 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow)
 
     axis_x1 = new QValueAxis();
 	axis_y1 = new QValueAxis();
-	axis_x1->setRange(0, 1000);
+	axis_x1->setRange(-graphx_span, 0);
 	axis_y1->setRange(42.424, 42.425);
+    axis_x1->setTitleText(QString::fromUtf8("Time passed (Δt)"));
+    axis_y1->setTitleText(QString::fromUtf8("Encoder (°)"));
 
     axis_x2 = new QValueAxis();
 	axis_y2 = new QValueAxis();
-    axis_x2->setRange(0, 1000);
+    axis_x2->setRange(-graphx_span, 0);
 	axis_y2->setRange(0.0001, 0.0002);
+    axis_x2->setTitleText(QString::fromUtf8("Time passed (Δt)"));
+    axis_y2->setTitleText(QString::fromUtf8("Encoder (°)"));
 
 	ui->angle1_plot->chart()->addAxis(axis_x1, Qt::AlignBottom);
 	ui->angle1_plot->chart()->addAxis(axis_y1, Qt::AlignLeft);
@@ -56,6 +61,27 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow)
     timer = new QTimer(this);
     (void)connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(2000);
+
+    (void)connect(connect_window, &ConnectWindow::connectionChanged, this, [&](bool status) {
+        // Check if we have a connection before setting up these
+        if(status)
+        {
+            unsigned char buffer[1024];
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                    SV_CALL_DCS_ENC_GetTriggerPeriod
+                );
+            encoder_period = *(DCS::u32*)DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written).ptr;
+
+            float val = ui->doubleSpinBox->value();
+            max_graph_points = (int)round(val * graphx_span) + 2;
+        }
+        else
+        {
+            // Clear the graphs
+            series1->clear();
+            series2->clear();
+        }
+    }, Qt::QueuedConnection);
 }
 
 PositionWindow::~PositionWindow()
@@ -174,16 +200,13 @@ void PositionWindow::update()
         ui->doubleSpinBox_3->setDecimals(6);
         ui->doubleSpinBox_3->setValue(data.axis[3].calpos); // Axis X14
 
-        static int i = 0;
-        QPointF p1(i, data.axis[1].calpos);
-        QPointF p2(i, data.axis[3].calpos);
-        if(i < 1000) i++;
+        QPointF p1(0, data.axis[1].calpos);
+        QPointF p2(0, data.axis[3].calpos);
 
         insertRollingData(points1, p1);
         insertRollingData(points2, p2);
 
         auto [miny1, maxy1] = std::minmax_element(points1.begin(), points1.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
-
         auto [miny2, maxy2] = std::minmax_element(points2.begin(), points2.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
 
         axis_y1->setRange(miny1->y(), maxy1->y());
@@ -203,11 +226,26 @@ void PositionWindow::resetTimer()
         LOG_DEBUG("Reseting timer. dt = %d", timeout);
         timer->start();
         timer->setInterval(timeout);
+
+        max_graph_points = (int)round(val * graphx_span) + 2;
     }
     else
     {
         timer->stop();
     }
+}
+
+void PositionWindow::resetGraphPeriod()
+{
+    graphx_span = ui->spinBox->value();
+    float refresh_rate = ui->doubleSpinBox->value();
+    max_graph_points = (int)round(refresh_rate * graphx_span) + 2;
+
+    points1.clear();
+    points2.clear();
+
+    axis_x1->setRange(-graphx_span, 0);
+    axis_x2->setRange(-graphx_span, 0);
 }
 
 void PositionWindow::drawGraphsRolling()
@@ -218,13 +256,15 @@ void PositionWindow::drawGraphsRolling()
 
 void PositionWindow::insertRollingData(QVector<QPointF>& vector, const QPointF& data)
 {
-    vector.append(data);
-    if(vector.size() >= 1000)
+    int interval = timer->interval();
+    if(vector.size() >= max_graph_points)
     {
-        for(int i = 0; i < vector.size(); i++)
-        {
-            vector[i].setX(vector[i].x() - 1.0);
-        }
         vector.removeFirst();
     }
+
+    for(int i = 0; i < vector.size(); i++)
+    {
+        vector[i].setX(vector[i].x() - (interval / 1000.0f));
+    }
+    vector.append(data);
 }

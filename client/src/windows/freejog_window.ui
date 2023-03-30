@@ -77,7 +77,7 @@ Stop automatic running process to enable.</string>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label_13">
      <property name="font">
       <font>
        <weight>75</weight>
@@ -85,12 +85,12 @@ Stop automatic running process to enable.</string>
       </font>
      </property>
      <property name="text">
-      <string>Rotation</string>
+      <string>Rotation PID Parameters</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line">
+    <widget class="Line" name="line_5">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -100,14 +100,20 @@ Stop automatic running process to enable.</string>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
       <widget class="QLabel" name="label_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>0</width>
+         <width>15</width>
          <height>0</height>
         </size>
        </property>
        <property name="text">
-        <string>Free Jog Max Velocity</string>
+        <string>Kp</string>
        </property>
       </widget>
      </item>
@@ -116,15 +122,14 @@ Stop automatic running process to enable.</string>
        <property name="decimals">
         <number>3</number>
        </property>
-       <property name="maximum">
-        <double>45.000000000000000</double>
+       <property name="minimum">
+        <double>-9999999.000000000000000</double>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;deg/s&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <property name="maximum">
+        <double>9999999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
        </property>
       </widget>
      </item>
@@ -146,15 +151,21 @@ Stop automatic running process to enable.</string>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
-      <widget class="QLabel" name="label_11">
+      <widget class="QLabel" name="label_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>105</width>
+         <width>15</width>
          <height>0</height>
         </size>
        </property>
        <property name="text">
-        <string>Free Jog Acceleration</string>
+        <string>Ki</string>
        </property>
       </widget>
      </item>
@@ -163,15 +174,14 @@ Stop automatic running process to enable.</string>
        <property name="decimals">
         <number>3</number>
        </property>
-       <property name="maximum">
-        <double>1000000.000000000000000</double>
+       <property name="minimum">
+        <double>-9999999.000000000000000</double>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_12">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;deg/s&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <property name="maximum">
+        <double>9999999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
        </property>
       </widget>
      </item>
@@ -189,6 +199,78 @@ Stop automatic running process to enable.</string>
       </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLabel" name="label_11">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Kd</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="minimum">
+        <double>-9999999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>9999999.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Rotation</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -212,58 +294,15 @@ Stop automatic running process to enable.</string>
       </widget>
      </item>
      <item>
-      <widget class="QSlider" name="t1_slider">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>130</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="minimum">
-        <number>-5</number>
-       </property>
-       <property name="maximum">
-        <number>5</number>
-       </property>
-       <property name="singleStep">
-        <number>0</number>
-       </property>
-       <property name="pageStep">
-        <number>0</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="tickPosition">
-        <enum>QSlider::TicksBothSides</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QDoubleSpinBox" name="doubleSpinBox">
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::NoButtons</enum>
+        <enum>QAbstractSpinBox::UpDownArrows</enum>
        </property>
        <property name="decimals">
-        <number>3</number>
+        <number>6</number>
        </property>
        <property name="minimum">
         <double>-360.000000000000000</double>
@@ -283,6 +322,13 @@ Stop automatic running process to enable.</string>
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>deg</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Move</string>
        </property>
       </widget>
      </item>
@@ -311,43 +357,6 @@ Stop automatic running process to enable.</string>
       </widget>
      </item>
      <item>
-      <widget class="QSlider" name="t2_slider">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>130</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="minimum">
-        <number>-5</number>
-       </property>
-       <property name="maximum">
-        <number>5</number>
-       </property>
-       <property name="singleStep">
-        <number>0</number>
-       </property>
-       <property name="pageStep">
-        <number>0</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="tickPosition">
-        <enum>QSlider::TicksBothSides</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -356,10 +365,10 @@ Stop automatic running process to enable.</string>
         <bool>false</bool>
        </property>
        <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::NoButtons</enum>
+        <enum>QAbstractSpinBox::UpDownArrows</enum>
        </property>
        <property name="decimals">
-        <number>3</number>
+        <number>6</number>
        </property>
        <property name="minimum">
         <double>-360.000000000000000</double>
@@ -368,7 +377,7 @@ Stop automatic running process to enable.</string>
         <double>360.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>0.000000000000000</double>
+        <double>0.000050000000000</double>
        </property>
       </widget>
      </item>
@@ -376,6 +385,13 @@ Stop automatic running process to enable.</string>
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>deg</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Move</string>
        </property>
       </widget>
      </item>

@@ -32,19 +32,18 @@ public:
 
 public slots:
 	void enableFreejog(bool e);
-	void resetSlider1();
-	void resetSlider2();
-
-	void moveEngine1Free(int val);
-	void moveEngine2Free(int val);
 
 	void moveEngine1To();
 	void moveEngine2To();
 
 	void moveTiltTo(int stage, int axis, QSpinBox* spin_obj);
 
-	void updateAcc();
-	void updateVel();
+	void updatePIDParams();
+
+	void enableMotion(int stage, bool enable);
+
+signals:
+	void enableMotionSignal(int stage, bool enable);
 
 private:
 	Ui::FreejogWindow* ui;
