@@ -18,9 +18,11 @@ int main(int argc, char* argv[])
 	// Initialize acquisition services
 	DCS::DAQ::Init();
 
+#ifdef DCS_MODULE_ENCODER
 	// Initializes encoder services
 	DCS::f64 per_rev[] = {36000.0, 36000.0, 36000.0, 36000.0};
 	DCS::ENC::Init("10.80.0.99", 0b1010, per_rev);
+#endif
 
 	auto listen = DCS::Network::Server::Create(15777);
 
@@ -30,7 +32,9 @@ int main(int argc, char* argv[])
 
 	DCS::Network::Server::StopListening(listen);
 
+#ifdef DCS_MODULE_ENCODER
 	DCS::ENC::Terminate();
+#endif
 
 	DCS::DAQ::Terminate();
 
