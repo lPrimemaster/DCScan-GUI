@@ -27,6 +27,8 @@
     <file alias="mcaspectrum_window.png">png/mcaspectrum_window.png</file>
     <file alias="spectraldisplay_window.png">png/spectraldisplay_window.png</file>
     <file alias="acquisitioncontrol_window.png">png/acquisitioncontrol_window.png</file>
+    <file alias="clinometer_window.png">png/clinometer_window.png</file>
+    <file alias="simulation_window.png">png/simulation_window.png</file>
   </qresource>
 
   <qresource prefix="/sound">
