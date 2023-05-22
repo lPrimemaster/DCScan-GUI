@@ -66,12 +66,13 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow), en
         // Check if we have a connection before setting up these
         if(status)
         {
+#ifdef DCS_MODULE_ENCODER
             unsigned char buffer[1024];
             auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                     SV_CALL_DCS_ENC_GetTriggerPeriod
                 );
             encoder_period = *(DCS::u32*)DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written).ptr;
-
+#endif
             float val = ui->doubleSpinBox->value();
             max_graph_points = (int)round(val * graphx_span) + 2;
         }
@@ -95,7 +96,23 @@ void PositionWindow::update()
     // TODO : Make this non-blocking instead with SendAsync and a QThread
     if(connect_window->isNetworkConnected())
     {
-#if 0
+#ifdef DCS_MODULE_ENCODER
+        // Ask for encoder position
+        unsigned char buffer[1024];
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_ENC_InspectLastEncoderValues
+            );
+        auto enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        DCS::ENC::EncoderData data = (*(DCS::ENC::EncoderData*)enc.ptr);
+
+        ui->doubleSpinBox_2->setDecimals(6);
+        ui->doubleSpinBox_2->setValue(data.axis[1].calpos); // Axis X12
+        ui->doubleSpinBox_3->setDecimals(6);
+        ui->doubleSpinBox_3->setValue(data.axis[3].calpos); // Axis X14
+
+        QPointF p1(0, data.axis[1].calpos);
+        QPointF p2(0, data.axis[3].calpos);
+#else
         // Ask for engines position
         unsigned char buffer[1024];
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
@@ -114,95 +131,18 @@ void PositionWindow::update()
         
         auto pos2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-        // Ask for engines velocity
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::ESP301,
-                DCS::Utils::BasicString{ "1TV?" }
-            );
-        
-        auto vel1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::ESP301,
-                DCS::Utils::BasicString{ "2TV?" }
-            );
-        
-        auto vel2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-
-        // Ask for step engines position
-        // TODO : Check the connections and the motion directions
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::PMC8742,
-                DCS::Utils::BasicString{ "0>1TP?" }
-            );
-        
-        auto stepX1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::PMC8742,
-                DCS::Utils::BasicString{ "0>2TP?" }
-            );
-        
-        auto stepY1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::PMC8742,
-                DCS::Utils::BasicString{ "1>1TP?" }
-            );
-        
-        auto stepX2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::PMC8742,
-                DCS::Utils::BasicString{ "1>2TP?" }
-            );
-        
-        auto stepY2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-
-        ui->doubleSpinBox_2->setValue(atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer));
-        ui->doubleSpinBox_3->setValue(atof((*(DCS::Utils::BasicString*)pos2.ptr).buffer));
-        ui->doubleSpinBox_4->setValue(atof((*(DCS::Utils::BasicString*)vel1.ptr).buffer));
-        ui->doubleSpinBox_5->setValue(atof((*(DCS::Utils::BasicString*)vel2.ptr).buffer));
-
-        ui->spinBox_6->setValue(atoi((*(DCS::Utils::BasicString*)stepX1.ptr).buffer));
-        ui->spinBox_8->setValue(atoi((*(DCS::Utils::BasicString*)stepY1.ptr).buffer));
-        ui->spinBox_7->setValue(atoi((*(DCS::Utils::BasicString*)stepX2.ptr).buffer));
-        ui->spinBox_9->setValue(atoi((*(DCS::Utils::BasicString*)stepY2.ptr).buffer));
-#elif 0
-        // Ask for engines position
-        unsigned char buffer[1024];
-        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupPositionCurrentGet(Group1.Pos, double*)" }
-            );
-        
-        auto pos1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        QString val1 = (*(DCS::Utils::BasicString*)pos1.ptr).buffer;
-        ui->doubleSpinBox_2->setValue(val1.split(',').at(1).toDouble());
-#else
-        // Ask for encoder position
-        unsigned char buffer[1024];
-        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_ENC_InspectLastEncoderValues
-            );
-        auto enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        DCS::ENC::EncoderData data = (*(DCS::ENC::EncoderData*)enc.ptr);
+        float float_pos1 = atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer);
+        float float_pos2 = atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer);
 
         ui->doubleSpinBox_2->setDecimals(6);
-        ui->doubleSpinBox_2->setValue(data.axis[1].calpos); // Axis X12
+        ui->doubleSpinBox_2->setValue(float_pos1); // Direct motor readouts
         ui->doubleSpinBox_3->setDecimals(6);
-        ui->doubleSpinBox_3->setValue(data.axis[3].calpos); // Axis X14
+        ui->doubleSpinBox_3->setValue(float_pos2); // Direct motor readouts
 
-        QPointF p1(0, data.axis[1].calpos);
-        QPointF p2(0, data.axis[3].calpos);
-
+        QPointF p1(0, float_pos1);
+        QPointF p2(0, float_pos2);
+#endif
         insertRollingData(points1, p1);
         insertRollingData(points2, p2);
 
@@ -210,10 +150,9 @@ void PositionWindow::update()
         auto [miny2, maxy2] = std::minmax_element(points2.begin(), points2.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
 
         axis_y1->setRange(miny1->y(), maxy1->y());
-	    axis_y2->setRange(miny2->y(), maxy2->y());
+        axis_y2->setRange(miny2->y(), maxy2->y());
 
         emit appendToGraphs();
-#endif
     }
 }
 
