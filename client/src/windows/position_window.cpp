@@ -13,6 +13,8 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow), en
 
     series1 = new QLineSeries();
     series2 = new QLineSeries();
+    series3 = new QLineSeries();
+    series4 = new QLineSeries();
 
     QVector<QPointF> points(1000);
     for(int i = 0; i < points.size(); i++)
@@ -24,18 +26,27 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow), en
     // TODO: Fetch the theme colors instead
     series1->setColor(QColor("#ed7e00"));
     series2->setColor(QColor("#ed7e00"));
+    series3->setColor(QColor("#ed7e00"));
+    series4->setColor(QColor("#ed7e00"));
 
     series1->replace(points);
     series2->replace(points);
+    series3->replace(points);
+    series4->replace(points);
+
     ui->angle1_plot->chart()->addSeries(series1);
     ui->angle2_plot->chart()->addSeries(series2);
+    ui->angle3_plot->chart()->addSeries(series3);
+    ui->angle4_plot->chart()->addSeries(series4);
     ui->angle1_plot->chart()->legend()->hide();
     ui->angle2_plot->chart()->legend()->hide();
+    ui->angle3_plot->chart()->legend()->hide();
+    ui->angle4_plot->chart()->legend()->hide();
 
     axis_x1 = new QValueAxis();
 	axis_y1 = new QValueAxis();
 	axis_x1->setRange(-graphx_span, 0);
-	axis_y1->setRange(42.424, 42.425);
+	axis_y1->setRange(0.0001, 0.0002);
     axis_x1->setTitleText(QString::fromUtf8("Time passed (Δt)"));
     axis_y1->setTitleText(QString::fromUtf8("Encoder (°)"));
 
@@ -46,17 +57,43 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow), en
     axis_x2->setTitleText(QString::fromUtf8("Time passed (Δt)"));
     axis_y2->setTitleText(QString::fromUtf8("Encoder (°)"));
 
+    axis_x3 = new QValueAxis();
+	axis_y3 = new QValueAxis();
+    axis_x3->setRange(-graphx_span, 0);
+	axis_y3->setRange(0.0001, 0.0002);
+    axis_x3->setTitleText(QString::fromUtf8("Time passed (Δt)"));
+    axis_y3->setTitleText(QString::fromUtf8("Encoder (°)"));
+
+    axis_x4 = new QValueAxis();
+	axis_y4 = new QValueAxis();
+    axis_x4->setRange(-graphx_span, 0);
+	axis_y4->setRange(0.0001, 0.0002);
+    axis_x4->setTitleText(QString::fromUtf8("Time passed (Δt)"));
+    axis_y4->setTitleText(QString::fromUtf8("Encoder (°)"));
+
 	ui->angle1_plot->chart()->addAxis(axis_x1, Qt::AlignBottom);
 	ui->angle1_plot->chart()->addAxis(axis_y1, Qt::AlignLeft);
     
     ui->angle2_plot->chart()->addAxis(axis_x2, Qt::AlignBottom);
 	ui->angle2_plot->chart()->addAxis(axis_y2, Qt::AlignLeft);
 
+    ui->angle3_plot->chart()->addAxis(axis_x3, Qt::AlignBottom);
+	ui->angle3_plot->chart()->addAxis(axis_y3, Qt::AlignLeft);
+
+    ui->angle4_plot->chart()->addAxis(axis_x4, Qt::AlignBottom);
+	ui->angle4_plot->chart()->addAxis(axis_y4, Qt::AlignLeft);
+
 	series1->attachAxis(axis_x1);
 	series1->attachAxis(axis_y1);
     
 	series2->attachAxis(axis_x2);
 	series2->attachAxis(axis_y2);
+
+    series3->attachAxis(axis_x3);
+	series3->attachAxis(axis_y3);
+
+    series4->attachAxis(axis_x4);
+	series4->attachAxis(axis_y4);
     
     timer = new QTimer(this);
     (void)connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -81,6 +118,8 @@ PositionWindow::PositionWindow(QWidget* parent) : ui(new Ui::PositionWindow), en
             // Clear the graphs
             series1->clear();
             series2->clear();
+            series3->clear();
+            series4->clear();
         }
     }, Qt::QueuedConnection);
 }
@@ -100,57 +139,96 @@ void PositionWindow::update()
         // Ask for encoder position
         unsigned char buffer[1024];
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_ENC_InspectLastEncoderValues
-            );
+            SV_CALL_DCS_ENC_InspectLastEncoderValues
+        );
         auto enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
         DCS::ENC::EncoderData data = (*(DCS::ENC::EncoderData*)enc.ptr);
 
+        // From the external encoder
         ui->doubleSpinBox_2->setDecimals(6);
-        ui->doubleSpinBox_2->setValue(data.axis[1].calpos); // Axis X12
+        ui->doubleSpinBox_2->setValue(data.axis[1].calpos + 120.637650); // Crystal 1 (Axis X12)
         ui->doubleSpinBox_3->setDecimals(6);
-        ui->doubleSpinBox_3->setValue(data.axis[3].calpos); // Axis X14
+        ui->doubleSpinBox_3->setValue(data.axis[3].calpos +  90.526640); // Crystal 2 (Axis X14)
 
-        QPointF p1(0, data.axis[1].calpos);
-        QPointF p2(0, data.axis[3].calpos);
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_IssueGenericCommandResponse,
+            DCS::Control::UnitTarget::XPSRLD4,
+            DCS::Utils::BasicString{ "GroupPositionCurrentGet(Table.Pos, double*)" }
+        );
+        enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        LOG_DEBUG("%s", (*(DCS::Utils::BasicString*)enc.ptr).buffer);
+        double table_pos = std::atof((*(DCS::Utils::BasicString*)enc.ptr).buffer);
+
+        // size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        //     SV_CALL_DCS_Control_IssueGenericCommandResponse,
+        //     DCS::Utils::BasicString{ "GroupPositionCurrentGet(Detector.Pos)" },
+        //     DCS::Control::UnitTarget::XPSRLD4
+        // );
+        // enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        // double detector_pos = std::atof((*(DCS::Utils::BasicString*)enc.ptr).buffer);
+
+        // double table_pos = data.axis[1].calpos;
+        // double detector_pos = data.axis[3].calpos;
+
+        // double table_pos = 0.2;
+        double detector_pos = 0.2;
+
+
+        // From the engines encoder
+        ui->doubleSpinBox_4->setDecimals(3);
+        ui->doubleSpinBox_4->setValue(table_pos);    // Table
+        ui->doubleSpinBox_5->setDecimals(3);
+        ui->doubleSpinBox_5->setValue(detector_pos); // Detector
+
+        QPointF p1(0, data.axis[1].calpos + 120.637650);
+        QPointF p2(0, data.axis[3].calpos +  90.526640);
+        QPointF p3(0, table_pos);
+        QPointF p4(0, detector_pos);
 #else
         // Ask for engines position
         unsigned char buffer[1024];
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::ESP301,
-                DCS::Utils::BasicString{ "1TP?" }
-            );
+            SV_CALL_DCS_Control_IssueGenericCommandResponse,
+            DCS::Control::UnitTarget::ESP301,
+            DCS::Utils::BasicString{ "1TP?" }
+        );
         
         auto pos1 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
         size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommandResponse,
-                DCS::Control::UnitTarget::ESP301,
-                DCS::Utils::BasicString{ "2TP?" }
-            );
+            SV_CALL_DCS_Control_IssueGenericCommandResponse,
+            DCS::Control::UnitTarget::ESP301,
+            DCS::Utils::BasicString{ "2TP?" }
+        );
         
         auto pos2 = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
 
-        float float_pos1 = atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer);
-        float float_pos2 = atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer);
+        double double_pos1 = std::atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer);
+        double double_pos2 = std::atof((*(DCS::Utils::BasicString*)pos1.ptr).buffer);
 
         ui->doubleSpinBox_2->setDecimals(6);
-        ui->doubleSpinBox_2->setValue(float_pos1); // Direct motor readouts
+        ui->doubleSpinBox_2->setValue(double_pos1); // Direct motor readouts
         ui->doubleSpinBox_3->setDecimals(6);
-        ui->doubleSpinBox_3->setValue(float_pos2); // Direct motor readouts
+        ui->doubleSpinBox_3->setValue(double_pos2); // Direct motor readouts
 
-        QPointF p1(0, float_pos1);
-        QPointF p2(0, float_pos2);
+        QPointF p1(0, double_pos1);
+        QPointF p2(0, double_pos2);
 #endif
         insertRollingData(points1, p1);
         insertRollingData(points2, p2);
+        insertRollingData(points3, p3);
+        insertRollingData(points4, p4);
 
         auto [miny1, maxy1] = std::minmax_element(points1.begin(), points1.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
         auto [miny2, maxy2] = std::minmax_element(points2.begin(), points2.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
+        auto [miny3, maxy3] = std::minmax_element(points3.begin(), points3.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
+        auto [miny4, maxy4] = std::minmax_element(points4.begin(), points4.end(), [](QPointF a, QPointF b) -> bool { return a.y() < b.y(); });
 
         axis_y1->setRange(miny1->y(), maxy1->y());
         axis_y2->setRange(miny2->y(), maxy2->y());
+        axis_y3->setRange(miny3->y() - 0.005, maxy3->y() + 0.005);
+        axis_y4->setRange(miny4->y() - 0.005, maxy4->y() + 0.005);
 
         emit appendToGraphs();
     }
@@ -180,17 +258,18 @@ void PositionWindow::resetGraphPeriod()
     float refresh_rate = ui->doubleSpinBox->value();
     max_graph_points = (int)round(refresh_rate * graphx_span) + 2;
 
-    points1.clear();
-    points2.clear();
-
     axis_x1->setRange(-graphx_span, 0);
     axis_x2->setRange(-graphx_span, 0);
+    axis_x3->setRange(-graphx_span, 0);
+    axis_x4->setRange(-graphx_span, 0);
 }
 
 void PositionWindow::drawGraphsRolling()
 {
     series1->replace(points1);
     series2->replace(points2);
+    series3->replace(points3);
+    series4->replace(points4);
 }
 
 void PositionWindow::insertRollingData(QVector<QPointF>& vector, const QPointF& data)

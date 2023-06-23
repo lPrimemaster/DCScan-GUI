@@ -39,18 +39,18 @@ void FreejogWindow::updatePIDParams()
     auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
             SV_CALL_DCS_Control_SetPIDControlVariables,
             DCS::Control::UnitTarget::XPSRLD4,
-            DCS::Utils::BasicString{ "Group4" },
-            DCS::i8(2), Kp, Ki, Kd
+            DCS::Utils::BasicString{ "Crystal1" },
+            DCS::i8(0b0010), Kp, Ki, Kd
         );
     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-    // size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-    //         SV_CALL_DCS_Control_SetPIDControlVariables,
-    //         DCS::Control::UnitTarget::XPSRLD4,
-    //         DCS::Utils::BasicString{ "Group2" },
-    //         DCS::i8(4), Kp, Ki, Kd
-    //     );
-    // DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+    size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_SetPIDControlVariables,
+            DCS::Control::UnitTarget::XPSRLD4,
+            DCS::Utils::BasicString{ "Crystal2" },
+            DCS::i8(0b1000), Kp, Ki, Kd
+        );
+    DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 }
 
 void FreejogWindow::moveEngine1To()
@@ -84,7 +84,7 @@ void FreejogWindow::moveEngine1To()
         auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
                 SV_CALL_DCS_Control_MoveAbsolutePID,
                 DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "Group4" },
+                DCS::Utils::BasicString{ "Crystal1" },
                 ui->doubleSpinBox->value()
             );
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
@@ -112,15 +112,15 @@ void FreejogWindow::moveEngine2To()
     
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 #else
-        // unsigned char buffer[4096];
+        unsigned char buffer[4096];
 
-        // auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        //         SV_CALL_DCS_Control_MoveAbsolutePID,
-        //         DCS::Control::UnitTarget::XPSRLD4,
-        //         DCS::Utils::BasicString{ "Group4" },
-        //         ui->doubleSpinBox->value()
-        //     );
-        // DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Control_MoveAbsolutePID,
+                DCS::Control::UnitTarget::XPSRLD4,
+                DCS::Utils::BasicString{ "Crystal2" },
+                ui->doubleSpinBox_2->value()
+            );
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 #endif
     }
     else
@@ -192,47 +192,58 @@ void FreejogWindow::enableFreejog(bool e)
         ui->doubleSpinBox_3->setValue(atof((*(DCS::Utils::BasicString*)max_vel.ptr).buffer));
         ui->doubleSpinBox_4->setValue(atof((*(DCS::Utils::BasicString*)max_acc.ptr).buffer));
 #else
-        // Get default values for engines acc and vel
-        unsigned char buffer[1024];
+        // auto init_group = [=](const std::string& group_name) -> void
+        // {
+        //     // Get default values for engines acc and vel
+        //     unsigned char buffer[1024];
 
-        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupKill(Group4)" }
-            );
-        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        //     auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        //             SV_CALL_DCS_Control_IssueGenericCommand,
+        //             DCS::Control::UnitTarget::XPSRLD4,
+        //             DCS::Utils::BasicString{ ("GroupKill(" + group_name + ")").c_str() }
+        //         );
+        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupInitialize(Group4)" }
-            );
-        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        //             SV_CALL_DCS_Control_IssueGenericCommand,
+        //             DCS::Control::UnitTarget::XPSRLD4,
+        //             DCS::Utils::BasicString{ ("GroupInitialize(" + group_name + ")").c_str() }
+        //         );
+        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_IssueGenericCommand,
-                DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "GroupHomeSearch(Group4)" }
-            );
-        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        //             SV_CALL_DCS_Control_IssueGenericCommand,
+        //             DCS::Control::UnitTarget::XPSRLD4,
+        //             DCS::Utils::BasicString{ ("GroupHomeSearch(" + group_name + ")").c_str() }
+        //         );
+        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_SetPIDControlVariables,
-                DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "Group4" },
-                DCS::i8(2), -0.9, 0.0, 0.0
-            );
-        DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+        //             SV_CALL_DCS_Control_SetPIDControlVariables,
+        //             DCS::Control::UnitTarget::XPSRLD4,
+        //             DCS::Utils::BasicString{ group_name.c_str() },
+        //             DCS::i8(2), -0.9, 0.0, 0.0
+        //         );
+        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        // };
 
-        size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Control_MoveAbsolutePIDChanged, [](DCS::u8* data, DCS::u8* userData) {
-            DCS::Control::PIDStatusGroup* status = (DCS::Control::PIDStatusGroup*)data;
+        // init_group("Crystal1");
+        // init_group("Crystal2");
 
-            if (QString(status->group.buffer).contains("Group4"))
-            {
-                emit ((FreejogWindow*)userData)->enableMotionSignal(0, status->status == DCS::Control::PIDStatus::READY);
-            }
-        }, (DCS::u8*)this);
-        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::EVT_SUB, buffer, size_written);
+        // unsigned char buffer[1024];
+        // auto size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Control_MoveAbsolutePIDChanged, [](DCS::u8* data, DCS::u8* userData) {
+        //         DCS::Control::PIDStatusGroup* status = (DCS::Control::PIDStatusGroup*)data;
+
+        //         if (QString(status->group.buffer).contains("Crystal1"))
+        //         {
+        //             emit ((FreejogWindow*)userData)->enableMotionSignal(0, status->status == DCS::Control::PIDStatus::READY);
+        //         }
+        //         else if (QString(status->group.buffer).contains("Crystal2"))
+        //         {
+        //             emit ((FreejogWindow*)userData)->enableMotionSignal(1, status->status == DCS::Control::PIDStatus::READY);
+        //         }
+        //     }, (DCS::u8*)this);
+        // DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::EVT_SUB, buffer, size_written); 
 #endif
     }
 

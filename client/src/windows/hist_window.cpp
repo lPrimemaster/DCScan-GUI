@@ -138,7 +138,7 @@ void HistWindow::mouseDoubleClickEvent(QMouseEvent* event)
 		if(selected_bar_rect != nullptr)
 		{
 			selected_bin = std::round(getSeriesCoordFromChartCoord(lastMousePos, bar_series).x());
-			selected_bin = selected_bin > max_n_bins ? max_n_bins : selected_bin < 0 ? 0 : selected_bin;
+			selected_bin = selected_bin > static_cast<int>(max_n_bins) ? static_cast<int>(max_n_bins) : selected_bin < 0 ? 0 : selected_bin;
 			int current_val = static_cast<int>(bar_series->barSets()[0]->at(selected_bin));
 
 			QBrush b = selected_bar_rect->brush();

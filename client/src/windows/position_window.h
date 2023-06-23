@@ -56,11 +56,20 @@ private:
 
     QtCharts::QLineSeries* series1;
     QtCharts::QLineSeries* series2;
+    QtCharts::QLineSeries* series3;
+    QtCharts::QLineSeries* series4;
+
     QVector<QPointF> points1;
     QVector<QPointF> points2;
+    QVector<QPointF> points3;
+    QVector<QPointF> points4;
 
     QtCharts::QValueAxis* axis_x1;
 	QtCharts::QValueAxis* axis_y1;
     QtCharts::QValueAxis* axis_x2;
 	QtCharts::QValueAxis* axis_y2;
+    QtCharts::QValueAxis* axis_x3;
+	QtCharts::QValueAxis* axis_y3;
+    QtCharts::QValueAxis* axis_x4;
+	QtCharts::QValueAxis* axis_y4;
 };
