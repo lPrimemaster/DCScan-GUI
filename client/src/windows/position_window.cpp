@@ -146,9 +146,9 @@ void PositionWindow::update()
 
         // From the external encoder
         ui->doubleSpinBox_2->setDecimals(6);
-        ui->doubleSpinBox_2->setValue(data.axis[1].calpos + 120.637650); // Crystal 1 (Axis X12)
+        ui->doubleSpinBox_2->setValue(data.axis[1].calpos); // Crystal 1 (Axis X12)
         ui->doubleSpinBox_3->setDecimals(6);
-        ui->doubleSpinBox_3->setValue(data.axis[3].calpos +  90.526640); // Crystal 2 (Axis X14)
+        ui->doubleSpinBox_3->setValue(data.axis[3].calpos); // Crystal 2 (Axis X14)
 
         size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
             SV_CALL_DCS_Control_IssueGenericCommandResponse,
@@ -156,23 +156,35 @@ void PositionWindow::update()
             DCS::Utils::BasicString{ "GroupPositionCurrentGet(Table.Pos, double*)" }
         );
         enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        LOG_DEBUG("%s", (*(DCS::Utils::BasicString*)enc.ptr).buffer);
-        double table_pos = std::atof((*(DCS::Utils::BasicString*)enc.ptr).buffer);
+        auto table_response = QString((*(DCS::Utils::BasicString*)enc.ptr).buffer).split(',');
+        double table_pos = 0.0;
+        if(table_response[0].toInt() == 0)
+        {
+            size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Database_ReadValuef64,
+                DCS::Utils::BasicString{ "Geometric_AngleOffsetT" }
+            );
+            enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            table_pos = table_response[1].toDouble() + *(DCS::f64*)enc.ptr;
+        }
 
-        // size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        //     SV_CALL_DCS_Control_IssueGenericCommandResponse,
-        //     DCS::Utils::BasicString{ "GroupPositionCurrentGet(Detector.Pos)" },
-        //     DCS::Control::UnitTarget::XPSRLD4
-        // );
-        // enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        // double detector_pos = std::atof((*(DCS::Utils::BasicString*)enc.ptr).buffer);
-
-        // double table_pos = data.axis[1].calpos;
-        // double detector_pos = data.axis[3].calpos;
-
-        // double table_pos = 0.2;
-        double detector_pos = 0.2;
-
+        size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_IssueGenericCommandResponse,
+            DCS::Control::UnitTarget::XPSRLD4,
+            DCS::Utils::BasicString{ "GroupPositionCurrentGet(Detector.Pos, double*)" }
+        );
+        enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        auto detector_response = QString((*(DCS::Utils::BasicString*)enc.ptr).buffer).split(',');
+        double detector_pos = 0.0;
+        if(detector_response[0].toInt() == 0)
+        {
+            size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                SV_CALL_DCS_Database_ReadValuef64,
+                DCS::Utils::BasicString{ "Geometric_AngleOffsetD" }
+            );
+            enc = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            detector_pos = detector_response[1].toDouble() + *(DCS::f64*)enc.ptr;
+        }
 
         // From the engines encoder
         ui->doubleSpinBox_4->setDecimals(3);
@@ -180,8 +192,8 @@ void PositionWindow::update()
         ui->doubleSpinBox_5->setDecimals(3);
         ui->doubleSpinBox_5->setValue(detector_pos); // Detector
 
-        QPointF p1(0, data.axis[1].calpos + 120.637650);
-        QPointF p2(0, data.axis[3].calpos +  90.526640);
+        QPointF p1(0, data.axis[1].calpos);
+        QPointF p2(0, data.axis[3].calpos);
         QPointF p3(0, table_pos);
         QPointF p4(0, detector_pos);
 #else

@@ -93,9 +93,9 @@ void FreejogWindow::moveEngine1To()
 
 void FreejogWindow::moveEngine2To()
 {
+#if 0
     if(ui->doubleSpinBox_3->value() > 0.0f && ui->doubleSpinBox_4->value() > 0.0f)
     {
-#if 0
         QString cmd = "2VA" + QString::number(ui->doubleSpinBox_3->value()) + ";";
         unsigned char buffer[4096];
 
@@ -111,22 +111,22 @@ void FreejogWindow::moveEngine2To()
         );
     
         DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-#else
-        unsigned char buffer[4096];
-
-        auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-                SV_CALL_DCS_Control_MoveAbsolutePID,
-                DCS::Control::UnitTarget::XPSRLD4,
-                DCS::Utils::BasicString{ "Crystal2" },
-                ui->doubleSpinBox_2->value()
-            );
-        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-#endif
     }
     else
     {
         LOG_ERROR("Cannot move engine 2: acceleration or velocity value is zero.");
     }
+#else
+    unsigned char buffer[4096];
+
+    auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            SV_CALL_DCS_Control_MoveAbsolutePID,
+            DCS::Control::UnitTarget::XPSRLD4,
+            DCS::Utils::BasicString{ "Crystal2" },
+            ui->doubleSpinBox_2->value()
+        );
+    DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+#endif
 }
 
 void FreejogWindow::moveTiltTo(int stage, int axis, QSpinBox* spin_obj)
@@ -192,58 +192,112 @@ void FreejogWindow::enableFreejog(bool e)
         ui->doubleSpinBox_3->setValue(atof((*(DCS::Utils::BasicString*)max_vel.ptr).buffer));
         ui->doubleSpinBox_4->setValue(atof((*(DCS::Utils::BasicString*)max_acc.ptr).buffer));
 #else
-        // auto init_group = [=](const std::string& group_name) -> void
-        // {
-        //     // Get default values for engines acc and vel
-        //     unsigned char buffer[1024];
+        auto init_group = [=](const std::string& group_name) -> void
+        {
+            unsigned char buffer[1024];
+            DCS::Utils::BasicString command;
+            
+            // strcpy(command.buffer, ("GroupStatusGet(" + group_name +",int *)").c_str());
+            // auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            //         SV_CALL_DCS_Control_IssueGenericCommand,
+            //         DCS::Control::UnitTarget::XPSRLD4,
+            //         command
+            //     );
+            // auto status = DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            // auto status_int = QString((*(DCS::Utils::BasicString*)status.ptr).buffer).split(',')[1].toInt();
+            // LOG_DEBUG("%s", (*(DCS::Utils::BasicString*)status.ptr).buffer);
 
-        //     auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        //             SV_CALL_DCS_Control_IssueGenericCommand,
-        //             DCS::Control::UnitTarget::XPSRLD4,
-        //             DCS::Utils::BasicString{ ("GroupKill(" + group_name + ")").c_str() }
-        //         );
-        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            // if(status_int == 20)
+            // {
+            //     strcpy(command.buffer, ("GroupMotionEnable(" + group_name + ")").c_str());
+            //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+            //             SV_CALL_DCS_Control_IssueGenericCommand,
+            //             DCS::Control::UnitTarget::XPSRLD4,
+            //             command
+            //         );
+            //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            //     return;
+            // }
 
-        //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        //             SV_CALL_DCS_Control_IssueGenericCommand,
-        //             DCS::Control::UnitTarget::XPSRLD4,
-        //             DCS::Utils::BasicString{ ("GroupInitialize(" + group_name + ")").c_str() }
-        //         );
-        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            // if(status_int == 11 || status_int == 13)
+            // {
+            //     return;
+            // }
 
-        //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        //             SV_CALL_DCS_Control_IssueGenericCommand,
-        //             DCS::Control::UnitTarget::XPSRLD4,
-        //             DCS::Utils::BasicString{ ("GroupHomeSearch(" + group_name + ")").c_str() }
-        //         );
-        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            // if(status_int != 7)
+            // {
+            strcpy(command.buffer, ("GroupKill(" + group_name + ")").c_str());
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                    SV_CALL_DCS_Control_IssueGenericCommand,
+                    DCS::Control::UnitTarget::XPSRLD4,
+                    command
+                );
+            DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            // }
 
-        //     size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
-        //             SV_CALL_DCS_Control_SetPIDControlVariables,
-        //             DCS::Control::UnitTarget::XPSRLD4,
-        //             DCS::Utils::BasicString{ group_name.c_str() },
-        //             DCS::i8(2), -0.9, 0.0, 0.0
-        //         );
-        //     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
-        // };
+            strcpy(command.buffer,("GroupInitialize(" + group_name + ")").c_str());
+            size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                    SV_CALL_DCS_Control_IssueGenericCommand,
+                    DCS::Control::UnitTarget::XPSRLD4,
+                    command
+                );
+            DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
 
-        // init_group("Crystal1");
-        // init_group("Crystal2");
+            strcpy(command.buffer, ("GroupHomeSearch(" + group_name + ")").c_str());
+            size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                    SV_CALL_DCS_Control_IssueGenericCommand,
+                    DCS::Control::UnitTarget::XPSRLD4,
+                    command
+                );
+            DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+            LOG_MESSAGE("Setting up : %s", group_name.c_str());
+        };
 
-        // unsigned char buffer[1024];
-        // auto size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Control_MoveAbsolutePIDChanged, [](DCS::u8* data, DCS::u8* userData) {
-        //         DCS::Control::PIDStatusGroup* status = (DCS::Control::PIDStatusGroup*)data;
+        auto init_pid = [=](const std::string& group_name, const DCS::i8 axis, const DCS::f64 Kp) -> void
+        {
+            unsigned char buffer[1024];
+            DCS::Utils::BasicString command;
+            strcpy(command.buffer, group_name.c_str());
+            auto size_written = DCS::Registry::SVParams::GetDataFromParams(buffer,
+                    SV_CALL_DCS_Control_SetPIDControlVariables,
+                    DCS::Control::UnitTarget::XPSRLD4,
+                    command,
+                    axis, Kp, 0.0, 0.0
+                );
+            DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size_written);
+        };
 
-        //         if (QString(status->group.buffer).contains("Crystal1"))
-        //         {
-        //             emit ((FreejogWindow*)userData)->enableMotionSignal(0, status->status == DCS::Control::PIDStatus::READY);
-        //         }
-        //         else if (QString(status->group.buffer).contains("Crystal2"))
-        //         {
-        //             emit ((FreejogWindow*)userData)->enableMotionSignal(1, status->status == DCS::Control::PIDStatus::READY);
-        //         }
-        //     }, (DCS::u8*)this);
-        // DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::EVT_SUB, buffer, size_written); 
+        std::thread([&](){
+            init_group("Crystal1");
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+            init_group("Crystal2");
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+            init_group("Table");
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+            init_group("Detector");
+
+            // TODO : Make sure we always use a negative gain for C1's motor
+            init_pid("Crystal1", 2, -0.9);
+            init_pid("Crystal2", 4,  0.9);
+        }).detach();
+
+        unsigned char buffer[1024];
+        auto size_written = DCS::Registry::SetupEvent(buffer, SV_EVT_DCS_Control_MoveAbsolutePIDChanged, [](DCS::u8* data, DCS::u8* userData) {
+                DCS::Control::PIDStatusGroup* status = (DCS::Control::PIDStatusGroup*)data;
+
+                if (QString(status->group.buffer).contains("Crystal1"))
+                {
+                    emit ((FreejogWindow*)userData)->enableMotionSignal(0, status->status == DCS::Control::PIDStatus::READY);
+                }
+                else if (QString(status->group.buffer).contains("Crystal2"))
+                {
+                    emit ((FreejogWindow*)userData)->enableMotionSignal(1, status->status == DCS::Control::PIDStatus::READY);
+                }
+            }, (DCS::u8*)this);
+        DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::EVT_SUB, buffer, size_written); 
 #endif
     }
 

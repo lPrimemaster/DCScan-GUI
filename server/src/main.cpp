@@ -9,6 +9,9 @@ int main(int argc, char* argv[])
 	// Initialize Logger
 	DCS::Utils::Logger::Init(DCS::Utils::Logger::Verbosity::DEBUG);
 
+	// Initialize database
+	DCS::Database::Open();
+
 	// Initialize network services
 	DCS::Network::Init();
 
@@ -41,6 +44,8 @@ int main(int argc, char* argv[])
 	DCS::Control::StopServices();
 
 	DCS::Network::Destroy();
+
+	DCS::Database::Close();
 
 	DCS::Utils::Logger::Destroy();
 

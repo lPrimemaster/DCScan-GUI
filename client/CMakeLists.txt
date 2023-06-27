@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # maybe the issue is on my end. Nevertheless it is not harmful.
 set(CMAKE_EXE_LINKER_FLAGS "/IGNORE:4217 /NODEFAULTLIB:libcmt.lib")
 
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 # For Qt
 list(APPEND CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64")
 
