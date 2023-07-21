@@ -131,12 +131,13 @@ static void DisconnectLocal(DCS::Network::Socket socket)
 
 SimpleThread* ConnectWindow::disconnectFromServerInternal()
 {
-	// TODO : Cancel any jobs if they are running
 	if(net_connected)
 	{
 		net_connected = false;
-		emit connectionChanged(false);
 		auto ss = LoadingSplash::Start(this);
+		ss->setWorkingStatus("Cleaning up remote resources...");
+		emit connectionAboutToClose(); // Cleanup ongoing stuff on the server
+		emit connectionChanged(false);
 		ss->setWorkingStatus("Disconnecting from server...");
 		SimpleThread *workerThread = new SimpleThread(std::bind(&DisconnectLocal, socket), this);
 		(void)connect(workerThread, &SimpleThread::jobDone, ss, &LoadingSplash::finishExec);

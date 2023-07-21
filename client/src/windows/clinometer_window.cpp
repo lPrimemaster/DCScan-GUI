@@ -74,10 +74,10 @@ void ClinometerWindow::requestAIStop()
     auto size = DCS::Registry::SVParams::GetDataFromParams(buffer, SV_CALL_DCS_DAQ_StopAIAcquisition);
     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
-    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteAIVChannel, { "Axis0" });
+    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteChannel, { "Axis0" });
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
-    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteAIVChannel, { "Axis1" });
+    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteChannel, { "Axis1" });
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
     size = DCS::Registry::RemoveEvent(buffer, SV_EVT_DCS_DAQ_ClinometerEvent);

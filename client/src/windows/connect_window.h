@@ -51,6 +51,7 @@ public slots:
 	void changeSettings(bool v);
 
 signals:
+	void connectionAboutToClose();
 	void connectionChanged(bool connected);
 
 private:

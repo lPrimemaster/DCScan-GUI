@@ -65,16 +65,16 @@ MCASpectrumWindow::MCASpectrumWindow(QWidget* parent) : QChartView(parent)
     }, Qt::QueuedConnection);
 
 	acq_window = dynamic_cast<MainWindow*>(parent)->GetWindow<AcquisitionControlWindow>("Acquisition Control");
-    (void)connect(acq_window, &AcquisitionControlWindow::eventMCA, this, [&](DCS::DAQ::MCACountEventData data) {
-		// if(data.count < 2)
-		// {
-		for(int i = 0; i < data.count; i++)
-		{
-			set->replace(data.bins[i], set->at(data.bins[i]) + 1);
-		}
-		LOG_MESSAGE("Counts this frame: %d", data.count);
-		// }
-    }, Qt::QueuedConnection);
+    // (void)connect(acq_window, &AcquisitionControlWindow::eventMCA, this, [&](DCS::DAQ::MCACountEventData data) {
+	// 	// if(data.count < 2)
+	// 	// {
+	// 	for(int i = 0; i < data.count; i++)
+	// 	{
+	// 		set->replace(data.bins[i], set->at(data.bins[i]) + 1);
+	// 	}
+	// 	LOG_MESSAGE("Counts this frame: %d", data.count);
+	// 	// }
+    // }, Qt::QueuedConnection);
 }
 
 MCASpectrumWindow::~MCASpectrumWindow()

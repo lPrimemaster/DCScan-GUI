@@ -21,11 +21,12 @@
 #include "position_window.h"
 #include "channelviz_window.h"
 #include "layout_window.h"
-#include "spectraldisplay_window.h"
+#include "channelmanager_window.h"
 #include "mcaspectrum_window.h"
 #include "acquisitioncontrol_window.h"
 #include "clinometer_window.h"
 #include "simulation_window.h"
+#include "visualizer_window.h"
 
 #include <Windows.h>
 
@@ -234,9 +235,9 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto channelviz_window_icon            = QIcon(":/png/channelviz_window.png");
 	AddGenericWindow("Channel Visualizer", channelviz_window , channelviz_window_icon , "View", ads::NoDockWidgetArea);
 
-	auto spectraldisplay_window            = new SpectralDisplayWindow(this);
-	auto spectraldisplay_window_icon       = QIcon(":/png/spectraldisplay_window.png");
-	AddGenericWindow("Acquisition Details", spectraldisplay_window , spectraldisplay_window_icon , "View", ads::NoDockWidgetArea);
+	auto channelmanager_window            = new ChannelManagerWindow(this);
+	auto channelmanager_window_icon       = QIcon(":/png/channelmanager_window.png");
+	AddGenericWindow("Channel Manager", channelmanager_window , channelmanager_window_icon , "View", ads::NoDockWidgetArea);
 
 	auto acquisitioncontrol_window         = new AcquisitionControlWindow(this);
 	auto acquisitioncontrol_window_icon    = QIcon(":/png/acquisitioncontrol_window.png");
@@ -253,6 +254,10 @@ MainWindow::MainWindow(QApplication* app, QWidget *parent) : QMainWindow(parent)
 	auto simulation_window                 = new SimulationWindow(this);
 	auto simulation_window_icon            = QIcon(":/png/simulation_window.png");
 	AddGenericWindow("Simulation", simulation_window, simulation_window_icon, "View", ads::NoDockWidgetArea);
+
+	auto visualizer_window                 = new VisualizerWindow(this);
+	auto visualizer_window_icon            = QIcon(":/png/visualizer_window.png");
+	AddGenericWindow("Visualizer", visualizer_window, visualizer_window_icon, "View", ads::NoDockWidgetArea);
 
 	IssueStatusBarText("Loading perspectives...");
 

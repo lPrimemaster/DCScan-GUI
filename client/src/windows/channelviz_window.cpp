@@ -147,7 +147,7 @@ void ChannelvizWindow::requestAIStop()
 
     DCS::Network::Message::SendSync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
-    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteAIVChannel, { "T_ChannelViz" });
+    size = DCS::Registry::SVParams::GetDataFromParams<DCS::Utils::BasicString>(buffer, SV_CALL_DCS_DAQ_DeleteChannel, { "T_ChannelViz" });
 
     DCS::Network::Message::SendAsync(DCS::Network::Message::Operation::REQUEST, buffer, size);
 
