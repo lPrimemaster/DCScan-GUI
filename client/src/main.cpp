@@ -9,12 +9,20 @@
 #include <QThread>
 #include <QStyleFactory>
 #include <QFile>
+#include <QSurfaceFormat>
 
 int main(int argc, char *argv[])
 {
 	DCS::Utils::Logger::Init(DCS::Utils::Logger::Verbosity::DEBUG);
 
     QApplication a(argc, argv);
+
+	QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setVersion(3, 2);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
 
 	// Register custom signal data
 	//qRegisterMetaType<GraphSettings>("GraphSettings");

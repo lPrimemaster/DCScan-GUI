@@ -46,6 +46,7 @@ endif()
 qt5_add_resources(RESFILES res/res.qrc)
 
 set(SOURCE
+	src/common.h
 	src/main.cpp
 	src/windows/main_window.cpp
 	src/windows/main_window.h
@@ -75,9 +76,9 @@ set(SOURCE
 	src/windows/channelviz_window.cpp
 	src/windows/channelviz_window.ui
 
-	src/windows/spectraldisplay_window.h
-	src/windows/spectraldisplay_window.cpp
-	src/windows/spectraldisplay_window.ui
+	src/windows/channelmanager_window.h
+	src/windows/channelmanager_window.cpp
+	src/windows/channelmanager_window.ui
 
 	src/windows/mcaspectrum_window.h
 	src/windows/mcaspectrum_window.cpp
@@ -98,8 +99,17 @@ set(SOURCE
 	src/windows/simulation_window.cpp
 	src/windows/simulation_window.ui
 
+	src/windows/visualizer_window.h
+	src/windows/visualizer_window.cpp
+
 	src/dialogs/connect_dialog.h
 	src/dialogs/connect_dialog.ui
+	
+	src/dialogs/newchannel_dialog.h
+	src/dialogs/newchannel_dialog.ui
+
+	src/widgets/dnd_outputconfig.h
+	src/widgets/dnd_outputconfig.ui
 
 	src/extras/qindicator.h
 

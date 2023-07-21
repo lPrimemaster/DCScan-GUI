@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QLabel>
+#include <QString>
 
 class QIndicator : public QLabel
 {
@@ -14,10 +15,15 @@ public:
         RED, GREEN, YELLOW
     };
 
-    inline void setState(State state)
+    inline void setState(const State& state)
     {
         this->state = state;
 
+        if(descriptors.contains(state))
+        {
+            setToolTip(descriptors[state]);
+        }
+        
         switch (state)
         {
         case State::RED:
@@ -52,11 +58,17 @@ public:
         }
     }
 
-    inline State getState()
+    inline void setStateTooltip(const State& state, const QString& descriptor)
+    {
+        descriptors.insert(state, descriptor);
+    }
+
+    inline State getState() const
     {
         return state;
     }
 
 private:
     State state;
+    QMap<State, QString> descriptors;
 };
