@@ -2,18 +2,12 @@
 
 #include "../autogen_macros.h"
 
-#include <QTabWidget>
 #include <QWidget>
 #include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QSpinBox>
 #include <QComboBox>
-#include <QLineEdit>
-#include <QLabel>
-#include <QTimer>
-#include <QLineSeries>
-#include <QValueAxis>
+#include <QList>
+#include <QMap>
+#include <array>
 
 #include <DCS_Core/include/DCS_ModuleCore.h>
 #include <DCS_EngineControl/include/DCS_ModuleEngineControl.h>
@@ -22,10 +16,11 @@
 
 #include "main_window.h"
 #include "connect_window.h"
-#include "spectraldisplay_window.h"
-// #include "position_window.h"
+#include "channelmanager_window.h"
 
 UI_AUTOGEN(AcquisitionControlWindow)
+
+class DragNDropOutputConfig;
 
 // TODO : Allow this to know the current acquisition state and disable channel visualization
 class AcquisitionControlWindow : public QWidget
@@ -36,14 +31,37 @@ public:
 	AcquisitionControlWindow(QWidget* parent = nullptr);
 	~AcquisitionControlWindow();
 
-signals:
-	void workingChanged(bool working);
-	void eventMCA(DCS::DAQ::MCACountEventData data);
+private slots:
+	void addNewListModeField();
+	void deleteListModeField(DragNDropOutputConfig* item);
+	void swapField(DragNDropOutputConfig* item, int direction);
 
 private:
-	Ui::AcquisitionControlWindow* ui;
-	QMap<QString, int> channels;
+	bool currentEventValid();
 
-	bool local_net_status = false;
-	bool working = false;
+private:
+	ChannelManagerWindow* cmw;
+	Ui::AcquisitionControlWindow* ui;
+	QList<QString> listmode_output_vars;
+	static constexpr std::array AVAILABLE_OUT_VARS = {
+		"Time Wall",
+		"Time Real",
+		"Time Dead",
+		
+		"Counts",
+		"Counts Delta",
+		
+		"Bin",
+		"Corrected Bin",
+
+		"Calculated Bragg Angle",
+		"Calculated Lattice Spacing",
+
+		"Rotation Crystal 1",
+		"Rotation Crystal 2",
+		"Rotation Table",
+
+		"Temperature Crystal 1",
+		"Temperature Crystal 2"
+	};
 };
