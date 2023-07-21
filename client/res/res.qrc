@@ -14,6 +14,10 @@
     <file alias="check_on_h.png">png/check_on_h.png</file>
     <file alias="check_off.png">png/check_off.png</file>
     <file alias="check_off_h.png">png/check_off_h.png</file>
+    <file alias="up_chevron.png">png/up_chevron.png</file>
+    <file alias="down_chevron.png">png/down_chevron.png</file>
+    <file alias="plus.png">png/plus.png</file>
+    <file alias="minus.png">png/minus.png</file>
     <file alias="log_window.png">png/log_window.png</file>
     <file alias="remote_cont_window.png">png/remote_cont_window.png</file>
     <file alias="debug_window.png">png/debug_window.png</file>
@@ -25,10 +29,11 @@
     <file alias="channelviz_window.png">png/channelviz_window.png</file>
     <file alias="layout_window.png">png/layout_window.png</file>
     <file alias="mcaspectrum_window.png">png/mcaspectrum_window.png</file>
-    <file alias="spectraldisplay_window.png">png/spectraldisplay_window.png</file>
+    <file alias="channelmanager_window.png">png/channelmanager_window.png</file>
     <file alias="acquisitioncontrol_window.png">png/acquisitioncontrol_window.png</file>
     <file alias="clinometer_window.png">png/clinometer_window.png</file>
     <file alias="simulation_window.png">png/simulation_window.png</file>
+    <file alias="visualizer_window.png">png/visualizer_window.png</file>
   </qresource>
 
   <qresource prefix="/sound">
